@@ -1,7 +1,7 @@
 (function(Scratch) {
   'use strict';
   /*
-  * JSON extension v2.5 by skyhigh173 (English Version)
+  * JsAddon extension v1.0 by Yuki1209 (English Version)
   * Do not remove this comment
   */
 
@@ -27,7 +27,7 @@
               },
               js: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\') return \'hello JavaScript! \' + g + \' \' + l;'
+                defaultValue: 'let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;'
               },
             }
           },
@@ -39,6 +39,12 @@
           }
         }
       };
+    }
+
+    isFloat(n){
+      let res1 = Number.isInteger(n);
+      let res2 = Number(n) === n && n % 1 !== 0;
+      return res1 || res2;
     }
 
     replaceSubstringByIndex(inputString, startIndex, endIndex, replacement) {
@@ -79,10 +85,10 @@
               let n = 0; let e = 0;
               let className = '';
               let argument = '';
-              let cond = false;
+              let cond = -1;
               let scodeEnd = -1;
               while(true){
-                  //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\') return \'hello JavaScript! \' + g + \' \' + l;
+                  //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
                   n = js.indexOf('new', e);
                   console.log('new find', n);
                   if(n != -1){
@@ -90,11 +96,12 @@
                       let cls2 = js.indexOf(';');
                       let cls3 = js.indexOf(' ');
                       let cls4 = js.length;
-                      cond = true;
+                      
                       if(cls1 != -1){
                           className = js.substring(n + 4, cls1);
                           className = className.replace(' ', '');
                           scodeEnd = js.indexOf(')', cls1);
+                          cond = cls1;
                           if(scodeEnd == -1){
                               break;
                           }
@@ -113,13 +120,13 @@
 
                   console.log('classname', className);
 
-                  if(cond){
-                      let begA = js.indexOf('\'', cls1);
+                  if(cond != -1){
+                      let begA = js.indexOf('\'', cond);
                       let endA = js.indexOf('\'', begA + 1);
-                      let begA2 = js.indexOf('\"', cls1);
-                      let endA2 = js.indexOf('\"', begA + 1);
+                      let begA2 = js.indexOf('\"', cond);
+                      let endA2 = js.indexOf('\"', begA2 + 1);
 
-                      console('find argument', begA, endA, scodeEnd)
+                      console.log('find argument', begA, endA, scodeEnd)
 
                       
                       if(begA != -1 && endA != -1 && begA < scodeEnd && endA < scodeEnd){
@@ -136,17 +143,17 @@
                           if(globalVars.length > 0){
                               js = this.replaceSubstringByIndex(js, n, scodeEnd, globalVars[0].value)
                           }else{
-                              js = this.replaceSubstringByIndex(js, n, scodeEnd, 'null');
+                              js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
                           }
                       }else if(className == 'LVar'){
                           const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name != argument);
                           if(localVars.length > 0){
                               js = this.replaceSubstringByIndex(js, n, scodeEnd, localVars[0].value)
                           }else{
-                              js = this.replaceSubstringByIndex(js, n, scodeEnd, 'null');
+                              js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
                           }
                       }
-                      console.log('argument', argument);
+                      console.log('argument', argument, buffer);
 
                       className = '';
                   }
@@ -155,14 +162,25 @@
 
               let func = new Function(js);
               if(args.js.includes('return')){
-                  vm.runtime.getTargetForStage().variables[args.variable].value = func();
+                const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
+                console.log('vars', vm.editingTarget.variables);
+                let answer = func();
+                if(!this.isFloat(answer)){
+                  answer = '\'' + answer + '\'';
+                }
+                  if(globalVars.length > 0){
+                    vm.runtime.getTargetForStage().variables[args.variable].value = answer;
+                  }else{
+                    vm.editingTarget.variables[args.variable].value = answer;
+                  }
+                  return 'succesful';
               }else{
                   func();
               }
       }catch{
-          return '';
+          return 'failed';
       }
-      return '';
+      return 'failed';
     }
   }
 
