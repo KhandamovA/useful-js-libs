@@ -111,7 +111,7 @@
                       break;
                   }
 
-                  console.log('classname', className, cls1);
+                  console.log('classname', className);
 
                   if(cond){
                       let begA = js.indexOf('\'', cls1);
