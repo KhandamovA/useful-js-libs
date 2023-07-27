@@ -133,14 +133,14 @@
                         if(className == 'GVar'){
                             const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name != argument);
                             console.log('setValue', globalVars);
-                            if(globalVars > 0){
+                            if(globalVars.length > 0){
                                 js = this.replaceSubstringByIndex(js, n, scodeEnd, globalVars[0].value)
                             }else{
                                 js = this.replaceSubstringByIndex(js, n, scodeEnd, 'null');
                             }
                         }else if(className == 'LVar'){
                             const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name != argument);
-                            if(globalVars > 0){
+                            if(localVars.length > 0){
                                 js = this.replaceSubstringByIndex(js, n, scodeEnd, localVars[0].value)
                             }else{
                                 js = this.replaceSubstringByIndex(js, n, scodeEnd, 'null');
