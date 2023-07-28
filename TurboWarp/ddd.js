@@ -1,16 +1,23 @@
 (function (Scratch) {
   'use strict';
   /*
-  * JsAddon extension v1.0 by Yuki1209 (English Version)
-  * Do not remove this comment
+  * JsAddon extension v1.0 by KhandamovA
   */
 
   let functions = new Map;
 
+  /**
+   * @type {Array}
+   */
+  var dataStorage;
+
   class JSAddon {
     getInfo() {
+
+      this.init();
+      
       return {
-        id: 'Yuki1209',
+        id: 'KhandamovA',
         name: 'JsAddon',
         color1: '#4d0092',
         blocks: [
@@ -26,17 +33,6 @@
               js: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: 'let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;'
-              },
-            }
-          },
-          {
-            opcode: 'js_set_data_storage',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'set list [list] as data storage',
-            arguments: {
-              list: {
-                type: Scratch.ArgumentType.STRING,
-                menu: 'get_lists'
               },
             }
           },
@@ -68,6 +64,17 @@
                 type: Scratch.ArgumentType.STRING,
                 menu: 'get_vals'
               },
+            }
+          },
+          {
+            opcode: 'js_func_is_init',
+            blockType: Scratch.BlockType.BOOLEAN,
+            text: 'function by name [name] is registered?',
+            arguments: {
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'TestFunction'
+              }
             }
           },
           {
@@ -106,6 +113,11 @@
                 menu: 'get_vars'
               }
             }
+          },
+          {
+            opcode: 'js_ret_all_functions',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'all functions'
           },
         ],
         menus: {
@@ -150,6 +162,9 @@
       return firstPart + replacement + secondPart;
     }
 
+    init(){
+      dataStorage = vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddonStorage').value;
+    }
 
     getVars() {
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
@@ -398,7 +413,7 @@
       return 'error';
     }
 
-    js_init_func(args) {
+    js_init_func(args, until) {
       console.log(args);
       let access = true;
       if(!functions.has(args.name)){
@@ -571,6 +586,8 @@
             }
             return "";
         }
+      }else{
+        return "error";
       }
     }
 
@@ -646,8 +663,23 @@
       }
     }
 
-    js_set_data_storage(args, until){
 
+    js_func_is_init(args){
+      return functions.has(args.name);
+    }
+
+    js_ret_all_functions(args){
+      let ret = '';
+      let one = true;
+      functions.forEach((v, k)=>{
+        if(one){
+          ret += k;
+          one = false;
+        }else{
+          ret += ', ' + k;
+        }
+      });
+      return ret;
     }
   }
 
