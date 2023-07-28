@@ -30,6 +30,17 @@
             }
           },
           {
+            opcode: 'js_set_data_storage',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'set list [list] as data storage',
+            arguments: {
+              list: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_lists'
+              },
+            }
+          },
+          {
             opcode: 'js_exec_code_ret',
             blockType: Scratch.BlockType.REPORTER,
             text: 'return result from js code [js]',
@@ -85,11 +96,26 @@
               },
             }
           },
+          {
+            opcode: 'js_ret_convert_var',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'return [variable] as js variable',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_vars'
+              }
+            }
+          },
         ],
         menus: {
           get_vars: {
             acceptReporters: true,
             items: 'getVars'
+          },
+          get_lists: {
+            acceptReporters: true,
+            items: 'getLists'
           },
           get_vals: {
             acceptReporters: true,
@@ -144,6 +170,25 @@
       }));
     }
 
+    getLists() {
+      const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type == 'list');
+      const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type == 'list');
+      const uniqueVars = [...new Set([...globalVars, ...localVars])];
+      if (uniqueVars.length === 0) {
+        return [
+          {
+            text: 'select a list',
+            value: 'select a list'
+          }
+        ];
+      }
+
+      return uniqueVars.map(i => ({
+        text: i.name,
+        value: i.id
+      }));
+    }
+
     js_exec_code(args) {
       console.log(args.js);
       try {
@@ -157,6 +202,7 @@
         while (true) {
           //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
           n = js.indexOf('new', e);
+          e = n;
           console.log('new find', n);
           if (n != -1) {
             let cls1 = js.indexOf('(');
@@ -220,7 +266,7 @@
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
               }
             }
-            console.log('argument', argument, buffer);
+            console.log('argument', argument);
 
             className = '';
           }
@@ -245,9 +291,9 @@
           func();
         }
       } catch {
-        return 'failed';
+        return 'error';
       }
-      return 'failed';
+      return 'error';
     }
 
     js_exec_code_ret(args){
@@ -263,6 +309,7 @@
         while (true) {
           //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
           n = js.indexOf('new', e);
+          e = n;
           console.log('new find', n);
           if (n != -1) {
             let cls1 = js.indexOf('(');
@@ -311,7 +358,7 @@
             }
 
             if (className == 'GVar') {
-              const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name != argument);
+              const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name == argument);
               console.log('setValue', globalVars);
               if (globalVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + globalVars[0].value + "\"");
@@ -319,14 +366,14 @@
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
               }
             } else if (className == 'LVar') {
-              const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name != argument);
+              const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name == argument);
               if (localVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + localVars[0].value + "\"");
               } else {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
               }
             }
-            console.log('argument', argument, buffer);
+            console.log('argument', argument);
 
             className = '';
           }
@@ -346,60 +393,9 @@
           func();
         }
       } catch {
-        return '';
+        return 'error';
       }
-      return '';
-    }
-
-    js_exec_code_from_func(args){
-      console.log(args);
-
-      if(functions.has(args.func)){
-        const e = functions.get(args.func);
-
-        if(e.success){
-            let args_ = new Array;
-
-            try{
-            for(let i = 0; i < e.variables.length; i++){
-              let v;
-              if(e.variables[i].where = 0){
-                  v = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == e.variables[i].variable);
-              }else{
-                  v = Object.values(vm.editingTarget.variables).filter(x => x.id == e.variables[i].variable);
-              }
-
-              if(v.length > 0){
-                args_.push(v[0].value);
-              }else{
-                args_.push("non");
-              }
-            }
-
-            let ans = e.exec(...args_);
-            
-            const v2 = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
-            if(v2.length > 0){
-              if(e.isReturned){
-                vm.runtime.getTargetForStage().variables[args.variable].value = ans;
-              }else{
-
-              }
-            }else{
-              const v3 = Object.values(vm.editingTarget.variables).filter(x => x.id == args.variable);
-
-              if(e.isReturned){
-                vm.editingTarget.variables[args.variable].value = ans;
-              }else{
-
-              }
-            }}catch{
-
-            }
-          
-            
-        }
-      }
+      return 'error';
     }
 
     js_init_func(args) {
@@ -424,9 +420,11 @@
           let argument = '';
           let cond = -1;
           let scodeEnd = -1;
+          let counter = 0;
           while (true) {
             //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
             n = js.indexOf('new', e);
+            e = n;
             console.log('new find', n);
             if (n != -1) {
               let cls1 = js.indexOf('(');
@@ -468,29 +466,31 @@
   
               if (begA != -1 && endA != -1 && begA < scodeEnd && endA < scodeEnd) {
                 argument = js.substring(begA + 1, endA);
+                js = this.replaceSubstringByIndex(js, n, scodeEnd, '____' + counter);
+                counter++;
               } else if (begA2 != -1 && endA2 != -1 && begA2 < scodeEnd && endA2 < scodeEnd) {
                 argument = js.substring(begA2 + 1, endA2);
+                js = this.replaceSubstringByIndex(js, n, scodeEnd, '____' + counter);
+                counter++;
               } else {
                 e = js.length;
               }
+              
   
               if (className == 'GVar') {
                 const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name == argument);
                 vars_.push({
-                  begin : n,
-                  end : scodeEnd,
-                  variable : globalVars[0].id,
-                  index : 0,
+                  variable : globalVars.length > 0 ? globalVars[0].id : 'error',
+                  index : counter - 1,
                   where : 0
                 });
+
 
               } else if (className == 'LVar') {
                 const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name == argument);
                 vars_.push({
-                  begin : n,
-                  end : scodeEnd,
-                  variable : localVars[0].id,
-                  index : 0,
+                  variable : localVars.length > 0 ? localVars[0].id : 'error',
+                  index : counter - 1,
                   where : 1
                 });
               }
@@ -499,30 +499,14 @@
               className = '';
             }
           }
-          
-          let textScript = '';
-          let endScript = '';
-          for(let i = 0; i < vars_.length; i++){
-            const e = vars_[i];
-            if(i == 0){
-              textScript += "___" + i;
-              endScript  += "____" + i;
-            }else{
-              textScript += ", ___" + i;
-              endScript  += ", ____" + i;
-            }
-
-            js = this.replaceSubstringByIndex(js, e.begin, e.end, "___" + i);
-            vars_[i].index = i;
-          }
-          textScript += js;
 
 
           console.log('itog', js);
   
-          let func = new Function('____0','____1','____2','____3','____4','____5','____6','____7','____8','____9','____10','____11','____12','____13','____14','____15', textScript);
+          let func = new Function('____0','____1','____2','____3','____4','____5','____6','____7','____8','____9','____10','____11','____12','____13','____14','____15'
+          ,'____16','____17','____18','____19','____20','____21','____22','____23','____24','____25','____26','____27','____28','____29','____30','____31', js);
 
-          if(vars_.length > 16){
+          if(vars_.length > 32){
             functions.set(args.name, {
               success : false,
               exec : ()=>{ return 'error'; },
@@ -545,12 +529,125 @@
         } catch {
           return 'failed';
         }
-        return 'failed';
+        return 'success';
       }
     }
 
     js_exec_code_from_func_ret(args){
       console.log(args);
+
+      if(functions.has(args.func)){
+        const e = functions.get(args.func);
+
+        if(e.success){
+            let args_ = new Array;
+
+            try{
+            for(let i = 0; i < e.variables.length; i++){
+              let v;
+              if(e.variables[i].where == 0){
+                  v = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == e.variables[i].variable);
+              }else{
+                  v = Object.values(vm.editingTarget.variables).filter(x => x.id == e.variables[i].variable);
+              }
+
+              if(v.length > 0){
+                args_.push(v[0].value);
+              }else{
+                args_.push("\"none\"");
+              }
+            }
+
+            let ans = e.exec(...args_);
+            
+              if(e.isReturned){
+                return ans;
+              }else{
+                return "success";
+              }
+            
+              }catch{
+              return "error";
+            }
+            return "";
+        }
+      }
+    }
+
+    js_exec_code_from_func(args){
+      console.log(args);
+
+      if(functions.has(args.func)){
+        const e = functions.get(args.func);
+
+        if(e.success){
+            let args_ = new Array;
+
+            try{
+            for(let i = 0; i < e.variables.length; i++){
+              let v;
+              if(e.variables[i].where == 0){
+                  v = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == e.variables[i].variable);
+              }else{
+                  v = Object.values(vm.editingTarget.variables).filter(x => x.id == e.variables[i].variable);
+              }
+
+              if(v.length > 0){
+                args_.push(v[0].value);
+              }else{
+                args_.push("\"none\"");
+              }
+            }
+
+            let ans = e.exec(...args_);
+            
+            const v2 = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
+            if(v2.length > 0){
+              if(e.isReturned){
+                vm.runtime.getTargetForStage().variables[args.variable].value = ans;
+              }else{
+
+              }
+            }else{
+              const v3 = Object.values(vm.editingTarget.variables).filter(x => x.id == args.variable);
+
+              if(e.isReturned){
+                vm.editingTarget.variables[args.variable].value = ans;
+              }else{
+
+              }
+            }}catch{
+
+            }
+          
+            
+        }
+      }
+    }
+
+    js_ret_convert_var(args, until){
+      // const v = until.target.lookupVariableById(args.variable);
+      try{
+      const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
+      const localVars = Object.values(vm.editingTarget.variables).filter(x => x.id == args.variable);
+      let v;
+      let type;
+      if(globalVars.length > 0){
+        v = globalVars[0];
+        type = "GVar";
+      }else{
+        v = localVars[0];
+        type = "LVar";
+      }
+      console.log('until', until.target.lookupVariableById(args.variable), until);
+      return "let any_name_var = new " + type + "('" + v.name + "');";
+    }catch{
+        return 'error';
+      }
+    }
+
+    js_set_data_storage(args, until){
+
     }
   }
 
