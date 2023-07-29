@@ -24,7 +24,7 @@
     text: text
   });
 
-
+  const my_id = 'KhandamovA';
 
   class JSAddon {
     getInfo() {
@@ -348,7 +348,65 @@
       });
     }
 
-    getVars() {
+    getBlocksOpcode(container, opcode){
+      opcode = my_id + "_" + opcode;
+      const fblocks = Object.values(container).filter(x => x.opcode == opcode);
+
+      /**
+       * @type {Array<{opcode : text, inputs : Array, fields : Array}>}
+       */
+      let ret = new Array;
+      for(let i = 0; i < fblocks.length; i++){
+        ret.push({
+          opcode : fblocks[i].opcode,
+          inputs : Object.values(fblocks[i].inputs),
+          fields : Object.values(fblocks[i].fields)
+        });
+      }
+
+      return ret;
+    }
+
+    getBlockId(container, id){
+      const fblocks = Object.values(container).filter(x => x.id == id);
+      
+      /**
+       * @type {{opcode : text, inputs : Array, fields : Array}}
+       */
+      let ret;
+      if(fblocks.length > 0){
+        ret = {
+          success : true,
+          opcode : fblocks[0].opcode,
+          inputs : Object.values(fblocks[0].inputs),
+          fields : Object.values(fblocks[0].fields)
+        };
+        return ret;
+      }else{
+        ret = {
+          success : false
+        }
+        return ret;
+      }
+    }
+
+    getVars(targetid) {
+      //Получение цели
+      {
+        let mytarget = null;
+        const result = Object.values(vm.runtime.targets).filter(x => x.id == targetid);
+        if(result.length > 0){
+          mytarget = result[0];
+        }
+
+        if(mytarget != null){
+          const blocks = mytarget.blocks._blocks;
+          let b = this.getBlockOpcode(blocks, 'js_exec_code');
+        }
+
+        console.log(targetid, mytarget);
+      }
+
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
       const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type != 'list');
       const uniqueVars = [...new Set([...globalVars, ...localVars])];
