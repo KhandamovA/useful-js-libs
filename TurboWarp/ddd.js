@@ -457,6 +457,11 @@
     getBlockId(container_, id_) {
       const fblocks = Object.values(container_).filter(x => x.id == id_);
 
+      if(id_ == undefined || id_ == null){
+        return {
+          success : false
+        }
+      }
       /**
        * @type {{opcode : text, inputs : Array<{name : text, id : text}>, fields : Array<{name : text, value : text}}}
        */
@@ -466,7 +471,7 @@
           * @type {Array<{name : text, id : text}>}
           */
         let input_ = new Array;
-        const inputs_ = Object.values(fblocks[i].inputs);
+        const inputs_ = Object.values(fblocks[0].inputs);
         inputs_.forEach(v => {
           input_.push({
             name: v.name,
@@ -478,7 +483,7 @@
           * @type {Array<{name : text, value : text}>}
           */
         let field_ = new Array;
-        const fields_ = Object.values(fblocks[i].fields);
+        const fields_ = Object.values(fblocks[0].fields);
         fields_.forEach(v => {
           field_.push({
             name: v.name,
@@ -571,15 +576,36 @@
       }
     }
 
+    helper(res, blks, id){
+      let block = this.getBlockId(blocks, id);
+      if(block.success == false){
+        return;
+      }else{
+        if(block.fields.length > 0){
+
+        }else if(block.inputs.length > 0){
+
+        }else{
+          return;
+        }
+      }
+    }
+
     getJSONByConstruct(targetid) {
       let id = this.getIdFocusBlock();
-      let container = this.getTarget(targetid).blocks._blocks;
+      let blocks = this.getTarget(targetid).blocks._blocks;
       if (id != null) {
-        let block = this.getBlockId(container, id);
+        let block = this.getBlockId(blocks, id);
 
-        let variable = block.inputs[0];
-        let key = this.getBlockId(variable.id);
+        let results = { array : [] };
+        // this.helper(results, blocks, id);
 
+        let variable;
+        let key;
+        if(block.success == true && block.inputs.length > 0){
+          variable = block.inputs[0];
+          key = this.getBlockId(blocks, variable.id);
+        }
 
         console.log('getJSONByConstruct', id, block, vm);
 
