@@ -1,12 +1,17 @@
 (function (Scratch) {
   'use strict';
   /*
-  * JsAddon extension v1.0 by KhandamovA
-  */
+   * JsAddon extension v1.0 by KhandamovA
+   */
 
   let functions = new Map;
 
   let jsons_values = new Map;
+
+  /**
+   * @type {HTMLElement}
+   */
+  let focusElement;
 
   /**
    * @type {Array}
@@ -28,9 +33,7 @@
 
   class JSAddon {
     getInfo() {
-
       this.init();
-
       return {
         id: 'KhandamovA',
         name: 'JsAddon',
@@ -181,13 +184,17 @@
             }
           },
           {
-            opcode: '',
+            opcode: 'js_json_as_object',
             blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] as object',
+            text: '[variable] as object & get param [param]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: 'key'
+              },
+              param: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_constr_json'
               }
             }
           },
@@ -269,9 +276,18 @@
                 value: 'yes'
               },
             ]
+          },
+
+          get_constr_json: {
+            acceptReporters: true,
+            items: 'getJSONByConstruct'
           }
         }
       };
+    }
+
+    js_json_as_object(args, util) {
+      return args.variable + '.' + args.param;
     }
 
     isFloat(n) {
@@ -290,7 +306,52 @@
       return firstPart + replacement + secondPart;
     }
 
+    /**
+     * Возвращает айди блока под фокусом
+     * @returns id блока
+     */
+    getFocusBlock() {
+      for (let i = 0; i < 6; i++) {
+        if (focusElement == null) {
+          return null;
+        }
+        if (typeof focusElement.classList !== 'undefined') {
+          if (!focusElement.classList.contains('blocklyDraggable')) {
+            focusElement = focusElement.parentElement;
+          } else {
+            return focusElement;
+          }
+        } else {
+          return null;
+        }
+      }
+    }
+
+    getIdFocusBlock() {
+      let r = this.getFocusBlock();
+      return r == null ? null : r.getAttribute('data-id');
+    }
+
+    getFocusDropText() {
+      let f = focusElement.querySelectorAll('.blocklyDropdownText')
+      if (f.length > 0) {
+        return f[0];
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Входная точка где создаются нужные инструменты и ресурсы
+     */
     init() {
+      /**
+       * Событие для отслеживания элементов
+       */
+      document.addEventListener('mousemove', (event) => {
+        focusElement = event.target;
+      })
+
       dataStorage = vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
 
       try {
@@ -353,7 +414,7 @@
       const fblocks = Object.values(container).filter(x => x.opcode == opcode);
 
       /**
-       * @type {Array<{opcode : text, inputs : Array, fields : Array}>}
+       * @type {Array<{opcode : text, inputs : Array<{name : text, id : text}, fields : Array<{name : text, value : text}}>}
        */
       let ret = new Array;
       for (let i = 0; i < fblocks.length; i++) {
@@ -383,7 +444,7 @@
         });
 
         ret.push({
-          id : fblocks[i].id,
+          id: fblocks[i].id,
           opcode: fblocks[i].opcode,
           inputs: input_,
           fields: field_
@@ -397,15 +458,39 @@
       const fblocks = Object.values(container_).filter(x => x.id == id_);
 
       /**
-       * @type {{opcode : text, inputs : Array, fields : Array}}
+       * @type {{opcode : text, inputs : Array<{name : text, id : text}>, fields : Array<{name : text, value : text}}}
        */
       let ret;
       if (fblocks.length > 0) {
+        /**
+          * @type {Array<{name : text, id : text}>}
+          */
+        let input_ = new Array;
+        const inputs_ = Object.values(fblocks[i].inputs);
+        inputs_.forEach(v => {
+          input_.push({
+            name: v.name,
+            id: v.block
+          });
+        });
+
+        /**
+          * @type {Array<{name : text, value : text}>}
+          */
+        let field_ = new Array;
+        const fields_ = Object.values(fblocks[i].fields);
+        fields_.forEach(v => {
+          field_.push({
+            name: v.name,
+            value: v.value
+          });
+        });
+
         ret = {
           success: true,
           opcode: fblocks[0].opcode,
-          inputs: Object.values(fblocks[0].inputs),
-          fields: Object.values(fblocks[0].fields),
+          inputs: input_,
+          fields: field_,
           id: id_
         };
         return ret;
@@ -417,29 +502,17 @@
       }
     }
 
-    getTarget(targetid){
+    getTarget(targetid) {
       let mytarget = null;
-        const result = Object.values(vm.runtime.targets).filter(x => x.id == targetid);
-        if (result.length > 0) {
-          mytarget = result[0];
-        }
+      const result = Object.values(vm.runtime.targets).filter(x => x.id == targetid);
+      if (result.length > 0) {
+        mytarget = result[0];
+      }
 
-        return mytarget;
+      return mytarget;
     }
 
     getVars(targetid) {
-      //Получение цели
-      {
-        let mytarget = this.getTarget(targetid);
-
-        if (mytarget != null) {
-          const blocks = mytarget.blocks._blocks;
-          let b = this.getBlocksOpcode(blocks, 'js_exec_code');
-          console.log('blocks', mytarget, blocks, b);
-        }
-
-      }
-
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
       const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type != 'list');
       const uniqueVars = [...new Set([...globalVars, ...localVars])];
@@ -459,6 +532,8 @@
     }
 
     getLists() {
+      document.elementFromPoint()
+
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type == 'list');
       const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type == 'list');
       const uniqueVars = [...new Set([...globalVars, ...localVars])];
@@ -496,8 +571,25 @@
       }
     }
 
-    button(args, until) {
-      console.log('click!!!');
+    getJSONByConstruct(targetid) {
+      let id = this.getIdFocusBlock();
+      let container = this.getTarget(targetid).blocks._blocks;
+      if (id != null) {
+        let block = this.getBlockId(container, id);
+
+        let variable = block.inputs[0];
+        let key = this.getBlockId(variable.id);
+
+
+        console.log('getJSONByConstruct', id, block, vm);
+
+      }
+      return [
+        {
+          text: 'select a param',
+          value: 'select a param'
+        }
+      ];
     }
 
     js_exec_code(args) {
