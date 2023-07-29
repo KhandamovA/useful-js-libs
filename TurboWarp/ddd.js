@@ -309,28 +309,28 @@
       }
     }
 
-    deleteAllJsons(){
+    deleteAllJsons() {
       let e = 0;
-      while(true){
+      while (true) {
         let index = dataStorage.indexOf('$restore_json', e);
         e = index + 1;
-        if(index == -1){
+        if (index == -1) {
           break;
-        }else{
+        } else {
           dataStorage.splice(index, 3);
         }
       }
     }
 
-    deleteOneJsons(key){
+    deleteOneJsons(key) {
       let e = 0;
-      while(true){
+      while (true) {
         let index = dataStorage.indexOf('$restore_json', e);
         e = index + 1;
-        if(index == -1){
+        if (index == -1) {
           break;
-        }else{
-          if(dataStorage[index + 1] == key){
+        } else {
+          if (dataStorage[index + 1] == key) {
             dataStorage.splice(index, 3);
             break;
           }
@@ -338,17 +338,17 @@
       }
     }
 
-    saveJsons(){
+    saveJsons() {
       this.deleteAllJsons();
 
-      jsons_values.forEach((v, k)=>{
+      jsons_values.forEach((v, k) => {
         dataStorage.push('$restore_json');
         dataStorage.push(k);
         dataStorage.push(JSON.stringify(v));
       });
     }
 
-    getBlocksOpcode(container, opcode){
+    getBlocksOpcode(container, opcode) {
       opcode = my_id + "_" + opcode;
       const fblocks = Object.values(container).filter(x => x.opcode == opcode);
 
@@ -356,55 +356,88 @@
        * @type {Array<{opcode : text, inputs : Array, fields : Array}>}
        */
       let ret = new Array;
-      for(let i = 0; i < fblocks.length; i++){
+      for (let i = 0; i < fblocks.length; i++) {
+
+        /**
+         * @type {Array<{name : text, id : text}>}
+         */
+        let input_ = new Array;
+        const inputs_ = Object.values(fblocks[i].inputs);
+        inputs_.forEach(v => {
+          input_.push({
+            name: v.name,
+            id: v.block
+          });
+        });
+
+        /**
+          * @type {Array<{name : text, value : text}>}
+          */
+        let field_ = new Array;
+        const fields_ = Object.values(fblocks[i].fields);
+        fields_.forEach(v => {
+          field_.push({
+            name: v.name,
+            value: v.value
+          });
+        });
+
         ret.push({
-          opcode : fblocks[i].opcode,
-          inputs : Object.values(fblocks[i].inputs),
-          fields : Object.values(fblocks[i].fields)
+          id : fblocks[i].id,
+          opcode: fblocks[i].opcode,
+          inputs: input_,
+          fields: field_
         });
       }
 
       return ret;
     }
 
-    getBlockId(container, id){
-      const fblocks = Object.values(container).filter(x => x.id == id);
-      
+    getBlockId(container_, id_) {
+      const fblocks = Object.values(container_).filter(x => x.id == id_);
+
       /**
        * @type {{opcode : text, inputs : Array, fields : Array}}
        */
       let ret;
-      if(fblocks.length > 0){
+      if (fblocks.length > 0) {
         ret = {
-          success : true,
-          opcode : fblocks[0].opcode,
-          inputs : Object.values(fblocks[0].inputs),
-          fields : Object.values(fblocks[0].fields)
+          success: true,
+          opcode: fblocks[0].opcode,
+          inputs: Object.values(fblocks[0].inputs),
+          fields: Object.values(fblocks[0].fields),
+          id: id_
         };
         return ret;
-      }else{
+      } else {
         ret = {
-          success : false
+          success: false
         }
         return ret;
       }
     }
 
-    getVars(targetid) {
-      //Получение цели
-      {
-        let mytarget = null;
+    getTarget(targetid){
+      let mytarget = null;
         const result = Object.values(vm.runtime.targets).filter(x => x.id == targetid);
-        if(result.length > 0){
+        if (result.length > 0) {
           mytarget = result[0];
         }
 
-        if(mytarget != null){
+        return mytarget;
+    }
+
+    getVars(targetid) {
+      //Получение цели
+      {
+        let mytarget = this.getTarget(targetid);
+
+        if (mytarget != null) {
           const blocks = mytarget.blocks._blocks;
-          let b = this.getBlockOpcode(blocks, 'js_exec_code');
+          let b = this.getBlocksOpcode(blocks, 'js_exec_code');
+          console.log('blocks', mytarget, blocks, b);
         }
 
-        console.log(targetid, mytarget);
       }
 
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
@@ -446,19 +479,19 @@
 
     getJSONS() {
       let res = [];
-      jsons_values.forEach((v, k)=>{
+      jsons_values.forEach((v, k) => {
         res.push({
-          text : k.substring(1, k.length),
-          value : k.substring(1, k.length)
+          text: k.substring(1, k.length),
+          value: k.substring(1, k.length)
         })
       });
 
-      if(res.length == 0){
+      if (res.length == 0) {
         return [{
           text: 'select a variable',
           value: 'select a variable'
         }]
-      }else{
+      } else {
         return res;
       }
     }
@@ -945,29 +978,29 @@
       return ret;
     }
 
-    js_json_create({name}){
-      if(!jsons_values.has("j" + name)){
+    js_json_create({ name }) {
+      if (!jsons_values.has("j" + name)) {
         jsons_values.set("j" + name, {});
         return true;
       }
-        return false;
+      return false;
     }
 
-    js_json_delete({name}){
-      if(jsons_values.has("j" + name)){
+    js_json_delete({ name }) {
+      if (jsons_values.has("j" + name)) {
         jsons_values.delete("j" + name);
         return true;
       }
       return false;
     }
 
-    js_json_get_var({variable}){
-      if(variable ==  'select a variable')
-      return "";
+    js_json_get_var({ variable }) {
+      if (variable == 'select a variable')
+        return "";
       return variable;
     }
 
-    js_json_exist({name}){
+    js_json_exist({ name }) {
       return jsons_values.has(name);
     }
   }
