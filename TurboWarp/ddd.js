@@ -708,7 +708,7 @@
         if (index == -1) {
           break;
         } else {
-          this.dataStorage.splice(index, 3);
+          this.dataStorage.splice(index, 7);
         }
       }
       /**
