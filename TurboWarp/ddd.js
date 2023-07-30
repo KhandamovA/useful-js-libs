@@ -8,6 +8,8 @@
 
   let jsons_values = new Map;
 
+  let elements_styles = new Map;
+
   /**
    * @type {HTMLElement}
    */
@@ -37,6 +39,7 @@
         name: 'JsAddon',
         color1: '#4d0092',
         blocks: [
+          "---",
           labelblock('JS'),
           {
             opcode: 'js_exec_code',
@@ -147,6 +150,7 @@
             blockType: Scratch.BlockType.REPORTER,
             text: 'all functions'
           },
+          "---",
           labelblock('JSON'),
           {
             opcode: 'js_json_create',
@@ -336,14 +340,6 @@
             blockType: Scratch.BlockType.COMMAND,
             text: 'delete all json vars from dataStorage',
             arguments: {
-              variable: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'key'
-              },
-              item: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'item'
-              }
             }
           },
           {
@@ -351,14 +347,81 @@
             blockType: Scratch.BlockType.COMMAND,
             text: 'save in dataStorage all json vars',
             arguments: {
+            }
+          },
+          "---",
+          labelblock('Extra widgets'),
+          {
+            opcode: 'js_widgets_signal',
+            blockType: Scratch.BlockType.HAT,
+            text: 'When i receive signal at [sender] mutation',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              sender: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'sender'
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_register_style',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'register css style [style] by name [name]',
+            arguments: {
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'example-style'
+              },
+              style: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'color : black; background-color : transparent; border : none;'
+              }
+            }
+          },
+          {
+            opcode: 'js_widgets_get_style',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'get css style by name [name]',
+            arguments: {
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_styles'
+              }
+            }
+          },
+          {
+            opcode: 'js_widgets_remove_style',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete css style by name [name]',
+            arguments: {
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                menu : 'get_styles'
+              }
+            }
+          },
+          {
+            opcode: 'js_widgets_mutation',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'mutation [variable] to widget [widget] style [style] value [value]',
+            arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'key'
+                menu : 'get_vars'
               },
-              item: {
+              widget: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'item'
-              }
+                menu : 'get_widgets'
+              },
+              style: {
+                type: Scratch.ArgumentType.STRING,
+                menu : 'get_styles'
+              },
+              value: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
             }
           },
           labelblock('Extra'),
@@ -366,6 +429,10 @@
         ],
         menus: {
           get_vars: {
+            acceptReporters: true,
+            items: 'getVars'
+          },
+          sender: {
             acceptReporters: true,
             items: 'getVars'
           },
@@ -380,6 +447,23 @@
           get_funcs :{
             acceptReporters: true,
             items : 'getFuncs'
+          },
+          get_styles :{
+            acceptReporters: true,
+            items : 'getStyles'
+          },
+          get_widgets :{
+            acceptReporters: true,
+            items : [
+              {
+                text : 'textbox',
+                value : 'text'
+              },
+              {
+                text : 'button',
+                value : 'button'
+              }
+            ]
           },
           get_vals: {
             acceptReporters: true,
@@ -405,6 +489,118 @@
 
     get dataStorage(){
       return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
+    }
+
+    js_widgets_signal(args, util){
+      console.log('signal', args);
+    }
+
+    js_widgets_mutation({variable, widget, style, value}){
+      let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
+      for(let i = 0; i < res.length; i++){
+        let id = res[i].getAttribute('data-id');
+        if(id == variable){
+          let mutation_element = res[i].querySelectorAll('.khandamovA-mutation-element');
+
+          if(mutation_element.length > 0){
+            mutation_element[0].value = value;
+            break;
+          }
+
+          let monitor_default = res[i].querySelectorAll('[class^="monitor_default"');
+          let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
+
+          if(monitor_large.length > 0){
+            monitor_large[0].style = "display : none";
+          }
+          if(monitor_default.length > 0){
+            monitor_default[0].style = "display : none";
+          }
+
+          let elem = document.createElement('input');
+          elem.type = widget;
+          elem.classList.add('khandamovA-mutation-element');
+          elem.value = value;
+
+          if(elements_styles.has(style)){
+            elem.style = elements_styles.get(style);
+          }else{
+            elem.style = "";
+          }
+          
+          if(widget == 'button'){
+            elem.addEventListener('click', ()=>{
+              vm.runtime.startHats('KhandamovA_js_widgets_signal', {
+                sender : variable
+              });
+            });
+          }else if(widget == 'text'){
+            let var_ = this.getVariableData(variable);
+            elem.addEventListener('keyup', (event)=>{
+              var_.value = elem.value;
+              if(event.code === 'Enter'){
+                vm.runtime.startHats('KhandamovA_js_widgets_signal', {
+                  sender : variable
+                });
+                elem.value = '';
+              }
+            });
+          }
+
+          res[i].appendChild(elem);
+          
+          break;
+        }
+      }
+    }
+
+    js_widgets_get_style({name}){
+      if(elements_styles.has(name)){
+        return elements_styles.get(name);
+      }else{
+        return "";
+      }
+    }
+
+    js_widgets_register_style({name, style}){
+      name = name.replace(' ', '');
+      elements_styles.set(name, style);
+      this.saveStyles();
+    }
+
+    js_widgets_remove_style({name}){
+      elements_styles.delete(name);
+      this.saveStyles();
+    }
+
+    getVariableData(id){
+      let idv1 = Object.values(vm.runtime.targets);
+
+      for(let i = 0; i < idv1.length; i++){
+        let vals = Object.values(idv1[i].variables).filter(x => x.id == id);
+        if(vals.length > 0){
+          return vals[0];
+        }
+      }
+    }
+
+    saveStyles(){
+      let e = 0;
+      while (true) {
+        let index = this.dataStorage.indexOf('$restore_style', e);
+        e = index;
+        if (index == -1) {
+          break;
+        } else {
+          this.dataStorage.splice(index, 3);
+        }
+      }
+
+      elements_styles.forEach((v, k) => {
+        this.dataStorage.push('$restore_style');
+        this.dataStorage.push(k);
+        this.dataStorage.push(v);
+      });
     }
 
     testbutton(){
@@ -708,7 +904,7 @@
       document.body.insertBefore(styleMonitors, document.body.firstChild);
 
       /**
-       * Восстановление сохраненых Json-ов
+       * Восстановление сохраненых Json-ов, функций и стилей
        */
       try {
         for (let i = 0; i < this.dataStorage.length; i++) {
@@ -735,7 +931,11 @@
               isReturned : isReturned,
               cArguments : cArguments,
               variables : variables
-            })
+            });
+            i += 6;
+          }else if (v == '$restore_styles'){
+            elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
+            i += 2;
           }
         }
       } catch {
@@ -744,7 +944,6 @@
     }
 
     SaveFunctions(){
-      ///TODO fix save functions
       let e = 0;
       while (true) {
         let index = this.dataStorage.indexOf('$restore_function', e);
@@ -755,13 +954,6 @@
           this.dataStorage.splice(index, 7);
         }
       }
-      /**
-       * success: false,
-              exec: () => { return 'error'; },
-              isReturned: js.includes('return'),
-              cArguments: vars_.length,
-              variables: vars_
-       */
 
       functions.forEach((v, k) => {
         this.dataStorage.push('$restore_function');
@@ -946,6 +1138,25 @@
       }));
     }
 
+    getVarsV2(targetid) {
+      const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
+      const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type != 'list');
+      const uniqueVars = [...new Set([...globalVars, ...localVars])];
+      if (uniqueVars.length === 0) {
+        return [
+          {
+            text: 'select a variable',
+            value: 'select a variable'
+          }
+        ];
+      }
+
+      return uniqueVars.map(i => ({
+        text: i.name,
+        value: i.name
+      }));
+    }
+
     getLists() {
       document.elementFromPoint()
 
@@ -982,6 +1193,24 @@
           value: 'select a variable'
         }]
       } else {
+        return res;
+      }
+    }
+
+    getStyles() {
+      if(elements_styles.size == 0){
+        return [{
+          text : "select a style",
+          value : "select a style"
+        }];
+      }else{
+        let res = new Array;
+        elements_styles.forEach((v, k)=>{
+          res.push({
+            text : k,
+            value : k
+          });
+        });
         return res;
       }
     }
