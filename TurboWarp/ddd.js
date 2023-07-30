@@ -19,12 +19,15 @@
   });
 
   let buttonblock = (text, method_name) => ({
-    opcode: method_name,
+    func: method_name,
     blockType: Scratch.BlockType.BUTTON,
     text: text
   });
 
+
   const my_id = 'KhandamovA';
+
+  let isThrottled = false;
 
   class JSAddon {
     getInfo() {
@@ -358,6 +361,8 @@
               }
             }
           },
+          labelblock('Extra'),
+
         ],
         menus: {
           get_vars: {
@@ -400,6 +405,10 @@
 
     get dataStorage(){
       return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
+    }
+
+    testbutton(){
+      console.log('button');
     }
 
     js_json_remove_all_vars(){
@@ -675,10 +684,28 @@
        * Событие для отслеживания элементов
        */
       document.addEventListener('mousemove', (event) => {
-        focusElement = event.target;
-      })
+        if (!isThrottled) {
+          isThrottled = true;
+          focusElement = event.target;
+          setTimeout(() => {
+            isThrottled = false;
+          }, 100);
+      }});
 
-      vm.extensionManager.emitTargetsUpdate;
+      //custom styles for monitors
+      let styleMonitors = document.createElement('style');
+      styleMonitors.innerHTML = 
+      "[class^='monitor_monitor-container'] {" +
+      "background-color: transparent !important;" +
+      "border : none;" +
+      "}" + 
+      "[class^='monitor_large-'] {" +
+      "color : black;" +
+      "font-size : 18px;" +
+      "background-color: transparent !important;" +
+      "}";
+
+      document.body.insertBefore(styleMonitors, document.body.firstChild);
 
       /**
        * Восстановление сохраненых Json-ов
@@ -691,8 +718,25 @@
             let json = this.dataStorage[i + 2];
             i += 2;
             jsons_values.set(name, JSON.parse(json));
-          }
+          }else if (v == '$restore_function'){
+            let name = this.dataStorage[i + 1];
+            let success = this.dataStorage[i + 2] == 'true' ? true : false;
+            let exec = this.dataStorage[i + 3];
+            let isReturned = this.dataStorage[i + 4] == 'true' ? true : false;
+            let cArguments = this.dataStorage[i + 5];
+            let variables = JSON.parse(this.dataStorage[i + 6]);
 
+            let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
+            , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec);
+            
+            functions.set(name, {
+              success : success,
+              exec : func,
+              isReturned : isReturned,
+              cArguments : cArguments,
+              variables : variables
+            })
+          }
         }
       } catch {
 
@@ -723,10 +767,16 @@
         this.dataStorage.push('$restore_function');
         this.dataStorage.push(k);
         this.dataStorage.push(v.success);
-        this.dataStorage.push(v.exec.toString());
+        /**
+         * @type {string}
+         */
+        let textcode = v.exec.toString();
+        let beg = textcode.indexOf('{');
+        textcode = textcode.substring(beg + 1, textcode.length).slice(0, -1).replace('\n', ' ');
+        this.dataStorage.push(textcode);
         this.dataStorage.push(v.isReturned);
         this.dataStorage.push(v.cArguments);
-        this.dataStorage.push(JSON.parse(v.vars_));
+        this.dataStorage.push(JSON.stringify(v.variables));
       });
     }
 
@@ -983,7 +1033,7 @@
         if (json_var != null) {
           for (let i = 1; i < results.array.length - 1; i++) {
             let value = results.array[results.array.length - 1 - i];
-            if (typeof json_var[value] !== undefined) {
+            if (typeof json_var[value] !== 'undefined') {
               json_var = json_var[value];
             } else {
               answer = [{
@@ -1259,7 +1309,7 @@
       return 'error';
     }
 
-    js_init_func(args, until) {
+    js_init_func(args) {
       console.log(args);
       let access = true;
       if (!functions.has(args.name)) {
