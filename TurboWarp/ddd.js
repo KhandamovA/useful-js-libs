@@ -13,11 +13,6 @@
    */
   let focusElement;
 
-  /**
-   * @type {Array}
-   */
-  let dataStorage;
-
   let labelblock = (text) => ({
     blockType: Scratch.BlockType.LABEL,
     text: text
@@ -86,6 +81,17 @@
             }
           },
           {
+            opcode: 'js_remove_func',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete function by name [name]',
+            arguments: {
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                menu : 'get_funcs'
+              }
+            }
+          },
+          {
             opcode: 'js_func_is_init',
             blockType: Scratch.BlockType.BOOLEAN,
             text: 'function by name [name] is registered?',
@@ -107,7 +113,7 @@
               },
               func: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'TestFunction'
+                menu : 'get_funcs'
               },
             }
           },
@@ -118,7 +124,7 @@
             arguments: {
               func: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'TestFunction'
+                menu : 'get_funcs'
               },
             }
           },
@@ -142,29 +148,33 @@
           {
             opcode: 'js_json_create',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'create json variable [name]',
+            text: 'create json var [name] with value [value]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: 'myJson'
+              },
+              value: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: '{ "age" : 27, "name" : "Json", "items" : ["mask", "water", "axe"] }'
               }
             }
           },
           {
             opcode: 'js_json_delete',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete json variable [name]',
+            text: 'delete json var [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'myJson'
+                menu: 'get_jsons'
               }
             }
           },
           {
             opcode: 'js_json_exist',
             blockType: Scratch.BlockType.BOOLEAN,
-            text: 'json variable [name] exist?',
+            text: 'json var [name] exist?',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -175,7 +185,7 @@
           {
             opcode: 'js_json_get_var',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'get json key [variable]',
+            text: 'json var [variable]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -186,7 +196,7 @@
           {
             opcode: 'js_json_as_object',
             blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] as object & get param [param]',
+            text: '[variable] as object param [param]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -199,18 +209,7 @@
             }
           },
           {
-            opcode: '',
-            blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] as array',
-            arguments: {
-              variable: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'key'
-              }
-            }
-          },
-          {
-            opcode: '',
+            opcode: 'js_json_as_value',
             blockType: Scratch.BlockType.REPORTER,
             text: '[variable] as value',
             arguments: {
@@ -221,32 +220,141 @@
             }
           },
           {
-            opcode: '',
-            blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] get [param] object param',
+            opcode: 'js_json_set_new_key',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] set param [key] with value [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: 'key'
               },
-              param: {
+              value: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: 'param'
+                defaultValue: '0'
+              },
+              key: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'new_key'
               }
             }
           },
           {
-            opcode: '',
-            blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] get #[param] array elem',
+            opcode: 'js_json_remove_key',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] remove param [key]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: 'key'
               },
-              param: {
+              key: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'new_key'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_set_value',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] set value [value]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              value: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: '0'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_change_value',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] change value [value]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              value: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: '1'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_add_item_to_array',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] add item [item] to array',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              item: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'new item'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_remove_item_index',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] remove item #[item] in array',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              item: {
                 type: Scratch.ArgumentType.NUMBER,
                 defaultValue: 0
+              }
+            }
+          },
+          {
+            opcode: 'js_json_remove_item_name',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'key [variable] remove items with name [item] in array',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              item: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'item'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_remove_all_vars',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete all json vars from dataStorage',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              item: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'item'
+              }
+            }
+          },
+          {
+            opcode: 'js_json_save_all_vars',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'save in dataStorage all json vars',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+              item: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'item'
               }
             }
           },
@@ -263,6 +371,10 @@
           get_jsons: {
             acceptReporters: true,
             items: 'getJSONS'
+          },
+          get_funcs :{
+            acceptReporters: true,
+            items : 'getFuncs'
           },
           get_vals: {
             acceptReporters: true,
@@ -286,8 +398,222 @@
       };
     }
 
-    js_json_as_object(args, util) {
-      return args.variable + '.' + args.param;
+    get dataStorage(){
+      return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
+    }
+
+    js_json_remove_all_vars(){
+      this.deleteAllJsons();
+    }
+
+    js_json_save_all_vars(){
+      this.saveJsons();
+    }
+
+    js_json_remove_key({variable, key}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+          delete json[keys[keys.length - 1]][key];
+        }else if (keys.length == 1){
+          if(typeof json === 'object'){
+            delete json[key];
+          }
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_remove_item_index({variable, item}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+          json[keys[keys.length - 1]].splice(item, 1);
+        }else if (keys.length == 1){
+          if(typeof json === 'object'){
+            json.splice(item, 1);
+          }
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_remove_item_name({variable, item}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+          json[keys[keys.length - 1]] = json[keys[keys.length - 1]].filter(x => x != item);
+        }else if (keys.length == 1){
+          if(typeof json === 'object'){
+            json = json.filter(x => x != item);
+          }
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_set_new_key({variable, value, key}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
+          if(typeof json[keys[keys.length - 1]] === 'object'){
+            json[keys[keys.length - 1]][key] = value;
+          }else{
+            json[keys[keys.length - 1]] = {};
+            json[keys[keys.length - 1]][key] = value;
+          }
+        }else if (keys.length == 1){
+          json[key] = value;
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_as_object(args) {
+      return args.variable + '|' + args.param;
+    }
+
+    js_json_as_value({variable}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "undefined";
+          }
+        }
+
+        if(typeof json === 'string'){
+          return json;
+        }else{
+          return JSON.stringify(json);;
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_set_value({variable, value}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
+          json[keys[keys.length - 1]] = value;
+        }else if (keys.length == 1){
+          json = value;
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_change_value({variable, value}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(k.includes(keys[keys.length - 1])){
+          if(keys.length > 1 &&  typeof json[keys[keys.length - 1]] === 'number' || isNaN(json[keys[keys.length - 1]])){
+            json[keys[keys.length - 1]] += value;
+          }
+        }else if (keys.length == 1){
+          if(typeof json === 'number' || isNaN(json)){
+            json += value;
+          }
+        }
+      }else{
+        return "";
+      }
+    }
+
+    js_json_add_item_to_array({variable, item}){
+      let keys = variable.split('|');
+      if(keys.length >= 1 && jsons_values.has(keys[0])){
+        let json = jsons_values.get(keys[0]);
+        for(let i = 1; i < keys.length - 1; i++){
+          if(typeof json[keys[i]] !== 'undefined'){
+            json = json[keys[i]];
+          }else{
+            return "";
+          }
+        }
+
+        let k = Object.keys(json);
+        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
+          if(typeof json[keys[keys.length - 1]] === 'object'){
+            json[keys[keys.length - 1]].push(item);
+          }
+        }else if (keys.length == 1){
+          if(typeof json === 'object'){
+            json.push(item);
+          }
+        }
+      }else{
+        return "";
+      }
     }
 
     isFloat(n) {
@@ -352,14 +678,17 @@
         focusElement = event.target;
       })
 
-      dataStorage = vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
+      vm.extensionManager.emitTargetsUpdate;
 
+      /**
+       * Восстановление сохраненых Json-ов
+       */
       try {
-        for (let i = 0; i < dataStorage.length; i++) {
-          const v = dataStorage[i];
+        for (let i = 0; i < this.dataStorage.length; i++) {
+          const v = this.dataStorage[i];
           if (v == '$restore_json') {
-            let name = dataStorage[i + 1];
-            let json = dataStorage[i + 2];
+            let name = this.dataStorage[i + 1];
+            let json = this.dataStorage[i + 2];
             i += 2;
             jsons_values.set(name, JSON.parse(json));
           }
@@ -370,15 +699,46 @@
       }
     }
 
-    deleteAllJsons() {
+    SaveFunctions(){
+      ///TODO fix save functions
       let e = 0;
       while (true) {
-        let index = dataStorage.indexOf('$restore_json', e);
-        e = index + 1;
+        let index = this.dataStorage.indexOf('$restore_function', e);
+        e = index;
         if (index == -1) {
           break;
         } else {
-          dataStorage.splice(index, 3);
+          this.dataStorage.splice(index, 3);
+        }
+      }
+      /**
+       * success: false,
+              exec: () => { return 'error'; },
+              isReturned: js.includes('return'),
+              cArguments: vars_.length,
+              variables: vars_
+       */
+
+      functions.forEach((v, k) => {
+        this.dataStorage.push('$restore_function');
+        this.dataStorage.push(k);
+        this.dataStorage.push(v.success);
+        this.dataStorage.push(v.exec.toString());
+        this.dataStorage.push(v.isReturned);
+        this.dataStorage.push(v.cArguments);
+        this.dataStorage.push(JSON.parse(v.vars_));
+      });
+    }
+
+    deleteAllJsons() {
+      let e = 0;
+      while (true) {
+        let index = this.dataStorage.indexOf('$restore_json', e);
+        e = index;
+        if (index == -1) {
+          break;
+        } else {
+          this.dataStorage.splice(index, 3);
         }
       }
     }
@@ -386,13 +746,13 @@
     deleteOneJsons(key) {
       let e = 0;
       while (true) {
-        let index = dataStorage.indexOf('$restore_json', e);
+        let index = this.dataStorage.indexOf('$restore_json', e);
         e = index + 1;
         if (index == -1) {
           break;
         } else {
-          if (dataStorage[index + 1] == key) {
-            dataStorage.splice(index, 3);
+          if (this.dataStorage[index + 1] == key) {
+            this.dataStorage.splice(index, 3);
             break;
           }
         }
@@ -403,9 +763,9 @@
       this.deleteAllJsons();
 
       jsons_values.forEach((v, k) => {
-        dataStorage.push('$restore_json');
-        dataStorage.push(k);
-        dataStorage.push(JSON.stringify(v));
+        this.dataStorage.push('$restore_json');
+        this.dataStorage.push(k);
+        this.dataStorage.push(JSON.stringify(v));
       });
     }
 
@@ -457,9 +817,9 @@
     getBlockId(container_, id_) {
       const fblocks = Object.values(container_).filter(x => x.id == id_);
 
-      if(id_ == undefined || id_ == null){
+      if (id_ == undefined || id_ == null) {
         return {
-          success : false
+          success: false
         }
       }
       /**
@@ -561,8 +921,8 @@
       let res = [];
       jsons_values.forEach((v, k) => {
         res.push({
-          text: k.substring(1, k.length),
-          value: k.substring(1, k.length)
+          text: k,
+          value: k
         })
       });
 
@@ -576,16 +936,23 @@
       }
     }
 
-    helper(res, blks, id){
-      let block = this.getBlockId(blocks, id);
-      if(block.success == false){
+    getBlockParams(res, blks, id) {
+      let block = this.getBlockId(blks, id);
+      if (block.success == false) {
         return;
-      }else{
-        if(block.fields.length > 0){
-
-        }else if(block.inputs.length > 0){
-
-        }else{
+      } else {
+        if (block.fields.length > 0) {
+          for (let i = 0; i < block.fields.length; i++) {
+            let f = block.fields[block.fields.length - 1 - i];
+            res.array.push(f.value);
+          }
+          return;
+        } else if (block.inputs.length > 0) {
+          for (let i = 0; i < block.inputs.length; i++) {
+            let f = block.inputs[block.inputs.length - 1 - i];
+            this.getBlockParams(res, blks, f.id);
+          }
+        } else {
           return;
         }
       }
@@ -597,17 +964,63 @@
       if (id != null) {
         let block = this.getBlockId(blocks, id);
 
-        let results = { array : [] };
+        let results = { array: [] };
         // this.helper(results, blocks, id);
 
         let variable;
         let key;
-        if(block.success == true && block.inputs.length > 0){
-          variable = block.inputs[0];
-          key = this.getBlockId(blocks, variable.id);
+        if (block.success == true) {
+          this.getBlockParams(results, blocks, id);
         }
 
-        console.log('getJSONByConstruct', id, block, vm);
+        let json_var = null;
+        let answer = [];
+
+        if (results.array.length >= 2 && jsons_values.has(results.array[results.array.length - 1])) {
+          json_var = jsons_values.get(results.array[results.array.length - 1]);
+        }
+
+        if (json_var != null) {
+          for (let i = 1; i < results.array.length - 1; i++) {
+            let value = results.array[results.array.length - 1 - i];
+            if (typeof json_var[value] !== undefined) {
+              json_var = json_var[value];
+            } else {
+              answer = [{
+                text: 'failed',
+                value: 'failed'
+              }];
+              return answer;
+              break;
+            }
+          }
+
+          if (typeof json_var === 'number') {
+            answer = [{
+              text: 'select a param',
+              value: 'select a param'
+            }];
+          } else {
+            let keys = Object.keys(json_var);
+            for (let i = 0; i < keys.length; i++) {
+              answer.push({
+                text: keys[i],
+                value: keys[i]
+              });
+            }
+
+            if (keys.length == 0) {
+              answer.push({
+                text: 'object haven\'t params',
+                value: 'object haven\'t params'
+              });
+            }
+
+            return answer;
+          }
+        }
+
+        console.log('getJSONByConstruct', id, results, vm);
 
       }
       return [
@@ -616,6 +1029,25 @@
           value: 'select a param'
         }
       ];
+    }
+
+    getFuncs(){
+      let res = [];
+      functions.forEach((v, k) => {
+        res.push({
+          text: k,
+          value: k
+        })
+      });
+
+      if (res.length == 0) {
+        return [{
+          text: 'select a function',
+          value: 'select a function'
+        }]
+      } else {
+        return res;
+      }
     }
 
     js_exec_code(args) {
@@ -958,8 +1390,14 @@
         } catch {
           return 'failed';
         }
+        this.SaveFunctions();
         return 'success';
       }
+    }
+
+    js_remove_func(args, util){
+      functions.delete(args.name);
+      this.SaveFunctions();
     }
 
     js_exec_code_from_func_ret(args) {
@@ -1096,17 +1534,20 @@
       return ret;
     }
 
-    js_json_create({ name }) {
-      if (!jsons_values.has("j" + name)) {
-        jsons_values.set("j" + name, {});
-        return true;
-      }
+    js_json_create({ name, value }) {
+        try {
+          let json = JSON.parse(value);
+          jsons_values.set(name, json);
+          return true;
+        } catch {
+          return false;
+        }
       return false;
     }
 
     js_json_delete({ name }) {
-      if (jsons_values.has("j" + name)) {
-        jsons_values.delete("j" + name);
+      if (jsons_values.has(name)) {
+        jsons_values.delete(name);
         return true;
       }
       return false;
