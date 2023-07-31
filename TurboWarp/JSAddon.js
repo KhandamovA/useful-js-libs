@@ -1303,10 +1303,10 @@
       //custom styles for monitors
       let styleMonitors = document.createElement('style');
       styleMonitors.innerHTML =
-        // "[class^='monitor_monitor-container'] {" +
-        // "background-color: transparent !important;" +
-        // "border : none;" +
-        // "}" +
+        "[class^='monitor_monitor-container'] {" +
+        "background-color: transparent !important;" +
+        "border : none;" +
+        "}" +
         // "[class^='monitor_large-'] {" +
         // "color : black;" +
         // "font-size : 18px;" +
@@ -1363,13 +1363,13 @@
             let value = this.dataStorage[i + 4];
             let visible = this.dataStorage[i + 5];
             i += 5;
-            this.js_widgets_set_visible({variable, visible});
             if(widget == 'combobox' || widget == 'radio-buttons'){
               let source = value;
               this.js_widgets_mutation2({variable, widget, style, source});
             }else{
               this.js_widgets_mutation({variable, widget, style, value});
             }
+            this.js_widgets_set_visible({variable, visible});
           }
         }
       } catch {
