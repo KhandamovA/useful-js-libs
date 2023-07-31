@@ -48,8 +48,22 @@
 
   class JSAddon {
     getInfo() {
+      let styleMonitors = document.createElement('style');
+      
+      styleMonitors.innerHTML =
+        "[class^='monitor_monitor-container'] {" +
+        "background-color: transparent !important;" +
+        "border : none;" +
+        "display: none;" +
+        "}" +
+        ".khandamovA-hidden {" +
+        "display: none !important;" +
+        "}";
+
+      document.body.insertBefore(styleMonitors, document.body.firstChild);
+
       setTimeout(()=>{
-        this.init();
+        this.init({styleMonitors});
       }, 20);
 
       return {
@@ -1278,7 +1292,7 @@
     /**
      * Входная точка где создаются нужные инструменты и ресурсы
      */
-    init() {
+    init({styleMonitors}) {
       /**
        * Событие для отслеживания элементов
        */
@@ -1301,22 +1315,19 @@
       });
 
       //custom styles for monitors
-      let styleMonitors = document.createElement('style');
+      // let styleMonitors = document.createElement('style');
+      
       styleMonitors.innerHTML =
         "[class^='monitor_monitor-container'] {" +
         "background-color: transparent !important;" +
         "border : none;" +
+        // "display: none;" +
         "}" +
-        // "[class^='monitor_large-'] {" +
-        // "color : black;" +
-        // "font-size : 18px;" +
-        // "background-color: transparent !important;" +
-        // "}" +
         ".khandamovA-hidden {" +
         "display: none !important;" +
         "}";
 
-      document.body.insertBefore(styleMonitors, document.body.firstChild);
+      // document.body.insertBefore(styleMonitors, document.body.firstChild);
 
       /**
        * Восстановление сохраненых Json-ов, функций и стилей
