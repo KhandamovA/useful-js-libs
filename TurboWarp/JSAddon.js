@@ -1359,7 +1359,7 @@
               variables: variables
             });
             i += 6;
-          } else if (v == '$restore_styles') {
+          } else if (v == '$restore_style') {
             elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
             i += 2;
           }
