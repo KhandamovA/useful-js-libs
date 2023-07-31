@@ -706,10 +706,12 @@
           let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
 
           if (monitor_large.length > 0) {
-            monitor_large[0].style = "display : none; background-color: transparent;";
+            monitor_large[0].style = "display : none; background-color: transparent; border: none;";
+            monitor_large[0].parentElement.style += "display : none; background-color: transparent; border: none;";
           }
           if (monitor_default.length > 0) {
-            monitor_default[0].style = "display : none; background-color: transparent;";
+            monitor_default[0].style = "display : none; background-color: transparent; border: none;";
+            monitor_default[0].parentElement.style += "display : none; background-color: transparent; border: none;";
           }
 
           let elem = document.createElement('input');
@@ -845,7 +847,7 @@
                 v.value = value;
               }
             });
-            
+
             break;
           }
 
@@ -853,10 +855,12 @@
           let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
 
           if (monitor_large.length > 0) {
-            monitor_large[0].style = "display : none; background-color: transparent;";
+            monitor_large[0].style = "display : none; background-color: transparent; border: none;";
+            monitor_large[0].parentElement.style += "display : none; background-color: transparent; border: none;";
           }
           if (monitor_default.length > 0) {
-            monitor_default[0].style = "display : none; background-color: transparent;";
+            monitor_default[0].style = "display : none; background-color: transparent; border: none;";
+            monitor_default[0].parentElement.style += "display : none; background-color: transparent; border: none;";
           }
 
           /**
