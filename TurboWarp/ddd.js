@@ -1,3 +1,14 @@
+// /**
+//  * @typedef {Object} CustomElement
+//  * @property {string} id - Идентификатор элемента
+//  * @property {string} type - Тип элемента
+//  * @property {number} x - координата по Х
+//  * @property {number} y - координата по У
+//  * @property {number} w - Ширина элемента
+//  * @property {number} h - Высота элемента
+//  */
+
+
 (function (Scratch) {
   'use strict';
   /*
@@ -9,6 +20,10 @@
   let jsons_values = new Map;
 
   let elements_styles = new Map;
+
+  let mutations = new Map;
+
+  // let custom_elements = new Map;
 
   /**
    * @type {HTMLElement}
@@ -33,7 +48,10 @@
 
   class JSAddon {
     getInfo() {
-      this.init();
+      setTimeout(()=>{
+        this.init();
+      }, 20);
+
       return {
         id: 'KhandamovA',
         name: 'JsAddon',
@@ -93,7 +111,7 @@
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_funcs'
+                menu: 'get_funcs'
               }
             }
           },
@@ -119,7 +137,7 @@
               },
               func: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_funcs'
+                menu: 'get_funcs'
               },
             }
           },
@@ -130,7 +148,7 @@
             arguments: {
               func: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_funcs'
+                menu: 'get_funcs'
               },
             }
           },
@@ -345,7 +363,7 @@
           {
             opcode: 'js_json_save_all_vars',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'save in dataStorage all json vars',
+            text: 'save all json vars in dataStorage',
             arguments: {
             }
           },
@@ -354,7 +372,7 @@
           {
             opcode: 'js_widgets_signal',
             blockType: Scratch.BlockType.HAT,
-            text: 'When i receive signal at [sender] mutation',
+            text: 'When i receive signal at [sender] widget',
             isEdgeActivated: false,
             shouldRestartExistingThreads: true,
             arguments: {
@@ -397,7 +415,7 @@
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_styles'
+                menu: 'get_styles'
               }
             }
           },
@@ -408,20 +426,90 @@
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_vars'
+                menu: 'get_vars'
               },
               widget: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_widgets'
+                menu: 'get_widgets'
               },
               style: {
                 type: Scratch.ArgumentType.STRING,
-                menu : 'get_styles'
+                menu: 'get_styles'
               },
               value: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
+            }
+          },
+          {
+            opcode: 'js_widgets_mutation2',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'mutation [variable] to widget [widget] style [style] source list [source]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_vars'
+              },
+              widget: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_widgets2'
+              },
+              style: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_styles'
+              },
+              source: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_lists'
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_set_visible',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'widget [variable] set visible [visible]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              visible: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_vals'
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_is_mutation',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'variable [variable] is widget?',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_vars'
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_delete',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete mutant widgets from dataStorage',
+            arguments: {
+            }
+          },
+          {
+            opcode: 'js_widgets_save',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'save mutant widgets in dataStorage',
+            arguments: {
+            }
+          },
+          {
+            opcode: 'js_widgets_all',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'all widgets',
+            arguments: {
             }
           },
           labelblock('Extra'),
@@ -444,24 +532,45 @@
             acceptReporters: true,
             items: 'getJSONS'
           },
-          get_funcs :{
+          get_funcs: {
             acceptReporters: true,
-            items : 'getFuncs'
+            items: 'getFuncs'
           },
-          get_styles :{
+          get_styles: {
             acceptReporters: true,
-            items : 'getStyles'
+            items: 'getStyles'
           },
-          get_widgets :{
+          get_mutations: {
             acceptReporters: true,
-            items : [
+            items: 'getMutations'
+          },
+          get_widgets: {
+            acceptReporters: true,
+            items: [
               {
-                text : 'textbox',
-                value : 'text'
+                text: 'textbox',
+                value: 'text'
               },
               {
-                text : 'button',
-                value : 'button'
+                text: 'button',
+                value: 'button'
+              },
+              {
+                text: 'checkbox',
+                value: 'checkbox'
+              }
+            ]
+          },
+          get_widgets2: {
+            acceptReporters: true,
+            items: [
+              {
+                text: 'combobox',
+                value: 'combobox'
+              },
+              {
+                text: 'radio-buttons',
+                value: 'radio-buttons'
               }
             ]
           },
@@ -487,104 +596,394 @@
       };
     }
 
-    get dataStorage(){
+    get dataStorage() {
       return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
     }
 
-    js_widgets_signal(args, util){
+    js_widgets_all(){
+      this.getMutations();
+      let res = '';
+      mutations.forEach((v, k)=>{
+        res += k + ' ';
+      })
+      return res;
+    }
+
+    js_widgets_delete(){
+      let e = 0;
+      while (true) {
+        let index = this.dataStorage.indexOf('$restore_widget', e);
+        e = index;
+        if (index == -1) {
+          break;
+        } else {
+          this.dataStorage.splice(index, 6);
+        }
+      }
+    }
+
+    js_widgets_save(){
+      this.js_widgets_delete();
+
+      mutations.forEach((v, k) => {
+        this.dataStorage.push('$restore_widget');
+        this.dataStorage.push(v.id);
+        this.dataStorage.push(v.widget);
+        this.dataStorage.push(v.style);
+        this.dataStorage.push(v.value);
+        if(v.visible == undefined){
+          this.dataStorage.push('yes');
+        }else{
+          this.dataStorage.push(v.visible);
+        }
+      });
+    }
+
+    js_widgets_is_mutation({variable}){
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          return true;
+        }
+      });
+      return false;
+    }
+
+    js_widgets_set_visible({ variable, visible }) {
+      this.getMutations();
+
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          if (visible == 'yes') {
+            v.element.classList.remove('khandamovA-hidden');
+          } else {
+            v.element.classList.add('khandamovA-hidden');
+          }
+          v.visible = visible;
+        }
+      });
+      let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
+      for (let i = 0; i < res.length; i++) {
+        let id = res[i].getAttribute('data-id');
+        if (id == variable) {
+          let mutation_element = res[i].querySelectorAll('[class^="khandamovA-mutation-"]');
+
+          if (mutation_element.length > 0) {
+            if (visible == 'yes') {
+              mutation_element[0].classList.remove('khandamovA-hidden');
+            } else {
+              mutation_element[0].classList.add('khandamovA-hidden');
+            }
+            break;
+          }
+
+          break;
+        }
+      }
+    }
+
+    js_widgets_signal(args, util) {
       console.log('signal', args);
     }
 
-    js_widgets_mutation({variable, widget, style, value}){
+    js_widgets_mutation({ variable, widget, style, value }) {
       let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
-      for(let i = 0; i < res.length; i++){
+      for (let i = 0; i < res.length; i++) {
         let id = res[i].getAttribute('data-id');
-        if(id == variable){
+        if (id == variable) {
           let mutation_element = res[i].querySelectorAll('.khandamovA-mutation-element');
 
-          if(mutation_element.length > 0){
+          if (mutation_element.length > 0) {
             mutation_element[0].value = value;
+            mutations.forEach((v, k)=>{
+              if(v.id == variable){
+                v.value = value;
+              }
+            });
             break;
           }
 
           let monitor_default = res[i].querySelectorAll('[class^="monitor_default"');
           let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
 
-          if(monitor_large.length > 0){
-            monitor_large[0].style = "display : none";
+          if (monitor_large.length > 0) {
+            monitor_large[0].style = "display : none; background-color: transparent;";
           }
-          if(monitor_default.length > 0){
-            monitor_default[0].style = "display : none";
+          if (monitor_default.length > 0) {
+            monitor_default[0].style = "display : none; background-color: transparent;";
           }
 
           let elem = document.createElement('input');
           elem.type = widget;
           elem.classList.add('khandamovA-mutation-element');
           elem.value = value;
+          elem.id = 'm' + variable;
 
-          if(elements_styles.has(style)){
+          if (elements_styles.has(style)) {
             elem.style = elements_styles.get(style);
-          }else{
+          } else {
             elem.style = "";
           }
-          
-          if(widget == 'button'){
-            elem.addEventListener('click', ()=>{
+
+          if (widget == 'button') {
+            let var_ = this.getVariableData(variable);
+            var_.value = elem.value;
+            elem.addEventListener('click', () => {
               vm.runtime.startHats('KhandamovA_js_widgets_signal', {
-                sender : variable
+                sender: variable
               });
             });
-          }else if(widget == 'text'){
+            mutations.set(var_.name, {
+              id: var_.id,
+              element: elem,
+              widget : widget,
+              style : style,
+              value : value
+            })
+          } else if (widget == 'text') {
             let var_ = this.getVariableData(variable);
-            elem.addEventListener('keyup', (event)=>{
+            elem.addEventListener('keyup', (event) => {
               var_.value = elem.value;
-              if(event.code === 'Enter'){
+              if (event.code === 'Enter') {
                 vm.runtime.startHats('KhandamovA_js_widgets_signal', {
-                  sender : variable
+                  sender: variable
                 });
                 elem.value = '';
               }
             });
+            mutations.set(var_.name, {
+              id: var_.id,
+              element: elem,
+              widget : widget,
+              style : style,
+              value : value
+            })
+          } else if (widget == 'checkbox') {
+            let var_ = this.getVariableData(variable);
+            elem.addEventListener('click', () => {
+              var_.value = elem.checked;
+              vm.runtime.startHats('KhandamovA_js_widgets_signal', {
+                sender: variable
+              });
+            });
+            mutations.set(var_.name, {
+              id: var_.id,
+              element: elem,
+              widget : widget,
+              style : style,
+              value : value
+            });
           }
 
           res[i].appendChild(elem);
-          
+
           break;
         }
       }
     }
 
-    js_widgets_get_style({name}){
-      if(elements_styles.has(name)){
+    js_widgets_mutation2({ variable, widget, style, source }) {
+      let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
+      for (let i = 0; i < res.length; i++) {
+        let id = res[i].getAttribute('data-id');
+        if (id == variable) {
+          let mutation_element_combobox = res[i].querySelectorAll('.khandamovA-mutation-element-combobox');
+
+          if (mutation_element_combobox.length > 0) {
+            let list = this.getVariableData(source);
+            if (typeof list !== 'object') {
+              break;
+            }
+
+            if (list.value.length == 0) {
+              break;
+            }
+
+            mutation_element_combobox.innerHTML = '';
+
+            for (let i = 0; i < list.value.length; i++) {
+              let e = document.createElement('option');
+              e.value = list.value[i];
+              e.textContent = list.value[i];
+              mutation_element_combobox.appendChild(e);
+            }
+
+            mutations.forEach((v, k)=>{
+              if(v.id == variable){
+                v.value = value;
+              }
+            });
+            break;
+          }
+
+          let mutation_element_radios = res[i].querySelectorAll('.khandamovA-mutation-element-radio-buttons');
+
+          if (mutation_element_radios.length > 0) {
+            let list = this.getVariableData(source);
+            if (typeof list !== 'object') {
+              break;
+            }
+
+            if (list.value.length == 0) {
+              break;
+            }
+
+            mutation_element_radios.innerHTML = '';
+
+            for (let i = 0; i < list.value.length; i++) {
+              let e = document.createElement('input');
+              let l = document.createElement('label');
+              e.type = 'radio';
+              e.name = 'cond';
+              e.value = list.value[i];
+              l.appendChild(e);
+              l.innerHTML += '&nbsp;&nbsp;' + list.value[i];
+              mutation_element_radios.appendChild(l);
+            }
+
+            mutations.forEach((v, k)=>{
+              if(v.id == variable){
+                v.value = value;
+              }
+            });
+            
+            break;
+          }
+
+          let monitor_default = res[i].querySelectorAll('[class^="monitor_default"');
+          let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
+
+          if (monitor_large.length > 0) {
+            monitor_large[0].style = "display : none; background-color: transparent;";
+          }
+          if (monitor_default.length > 0) {
+            monitor_default[0].style = "display : none; background-color: transparent;";
+          }
+
+          /**
+           * @type {HTMLElement}
+           */
+          let elem;
+
+          if (widget == 'combobox') {
+            elem = document.createElement('select');
+            elem.id = 'm' + variable;
+            elem.classList.add('khandamovA-mutation-element-combobox');
+            elem.style = style;
+            let list = this.getVariableData(source);
+            if (typeof list !== 'object') {
+              break;
+            }
+
+            if (list.value.length == 0) {
+              break;
+            }
+
+            for (let i = 0; i < list.value.length; i++) {
+              let e = document.createElement('option');
+              e.value = list.value[i];
+              e.textContent = list.value[i];
+              elem.appendChild(e);
+            }
+
+            let var_ = this.getVariableData(variable);
+            elem.addEventListener('change', function (event) {
+              var_.value = event.target.value;
+              const selectedValue = event.target.value;
+              vm.runtime.startHats('KhandamovA_js_widgets_signal', {
+                sender: variable
+              });
+            });
+            mutations.set(var_.name, {
+              id: var_.id,
+              element: elem,
+              widget : widget,
+              style : style,
+              value : source
+            })
+
+          } else if (widget == 'radio-buttons') {
+            elem = document.createElement('form');
+            elem.id = 'm' + variable;
+            elem.classList.add('khandamovA-mutation-element-radio-buttons');
+            elem.style = "display: flex; flex-direction: column;" + style;
+
+            let list = this.getVariableData(source);
+            if (typeof list !== 'object') {
+              break;
+            }
+
+            if (list.value.length == 0) {
+              break;
+            }
+
+            for (let i = 0; i < list.value.length; i++) {
+              let e = document.createElement('input');
+              let l = document.createElement('label');
+              e.type = 'radio';
+              e.name = 'cond';
+              e.value = list.value[i];
+              l.appendChild(e);
+              l.innerHTML += '&nbsp;&nbsp;' + list.value[i];
+              elem.appendChild(l);
+            }
+
+            let var_ = this.getVariableData(variable);
+            elem.addEventListener('change', function (event) {
+              var_.value = event.target.value;
+              const selectedValue = event.target.value;
+              vm.runtime.startHats('KhandamovA_js_widgets_signal', {
+                sender: variable
+              });
+            });
+
+            mutations.set(var_.name, {
+              id: var_.id,
+              element: elem,
+              widget : widget,
+              style : style,
+              value : source
+            })
+          }
+
+
+          res[i].appendChild(elem);
+
+          break;
+        }
+      }
+    }
+
+    js_widgets_get_style({ name }) {
+      if (elements_styles.has(name)) {
         return elements_styles.get(name);
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_widgets_register_style({name, style}){
+    js_widgets_register_style({ name, style }) {
       name = name.replace(' ', '');
       elements_styles.set(name, style);
       this.saveStyles();
     }
 
-    js_widgets_remove_style({name}){
+    js_widgets_remove_style({ name }) {
       elements_styles.delete(name);
       this.saveStyles();
     }
 
-    getVariableData(id){
+    getVariableData(id) {
       let idv1 = Object.values(vm.runtime.targets);
 
-      for(let i = 0; i < idv1.length; i++){
+      for (let i = 0; i < idv1.length; i++) {
         let vals = Object.values(idv1[i].variables).filter(x => x.id == id);
-        if(vals.length > 0){
+        if (vals.length > 0) {
           return vals[0];
         }
       }
     }
 
-    saveStyles(){
+    saveStyles() {
       let e = 0;
       while (true) {
         let index = this.dataStorage.indexOf('$restore_style', e);
@@ -603,117 +1002,117 @@
       });
     }
 
-    testbutton(){
+    testbutton() {
       console.log('button');
     }
 
-    js_json_remove_all_vars(){
+    js_json_remove_all_vars() {
       this.deleteAllJsons();
     }
 
-    js_json_save_all_vars(){
+    js_json_save_all_vars() {
       this.saveJsons();
     }
 
-    js_json_remove_key({variable, key}){
+    js_json_remove_key({ variable, key }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
           delete json[keys[keys.length - 1]][key];
-        }else if (keys.length == 1){
-          if(typeof json === 'object'){
+        } else if (keys.length == 1) {
+          if (typeof json === 'object') {
             delete json[key];
           }
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_remove_item_index({variable, item}){
+    js_json_remove_item_index({ variable, item }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
           json[keys[keys.length - 1]].splice(item, 1);
-        }else if (keys.length == 1){
-          if(typeof json === 'object'){
+        } else if (keys.length == 1) {
+          if (typeof json === 'object') {
             json.splice(item, 1);
           }
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_remove_item_name({variable, item}){
+    js_json_remove_item_name({ variable, item }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 && k.includes(keys[keys.length - 1])){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
           json[keys[keys.length - 1]] = json[keys[keys.length - 1]].filter(x => x != item);
-        }else if (keys.length == 1){
-          if(typeof json === 'object'){
+        } else if (keys.length == 1) {
+          if (typeof json === 'object') {
             json = json.filter(x => x != item);
           }
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_set_new_key({variable, value, key}){
+    js_json_set_new_key({ variable, value, key }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
-          if(typeof json[keys[keys.length - 1]] === 'object'){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
+          if (typeof json[keys[keys.length - 1]] === 'object') {
             json[keys[keys.length - 1]][key] = value;
-          }else{
+          } else {
             json[keys[keys.length - 1]] = {};
             json[keys[keys.length - 1]][key] = value;
           }
-        }else if (keys.length == 1){
+        } else if (keys.length == 1) {
           json[key] = value;
         }
-      }else{
+      } else {
         return "";
       }
     }
@@ -722,101 +1121,101 @@
       return args.variable + '|' + args.param;
     }
 
-    js_json_as_value({variable}){
+    js_json_as_value({ variable }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "undefined";
           }
         }
 
-        if(typeof json === 'string'){
+        if (typeof json === 'string') {
           return json;
-        }else{
+        } else {
           return JSON.stringify(json);;
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_set_value({variable, value}){
+    js_json_set_value({ variable, value }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
           json[keys[keys.length - 1]] = value;
-        }else if (keys.length == 1){
+        } else if (keys.length == 1) {
           json = value;
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_change_value({variable, value}){
+    js_json_change_value({ variable, value }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(k.includes(keys[keys.length - 1])){
-          if(keys.length > 1 &&  typeof json[keys[keys.length - 1]] === 'number' || isNaN(json[keys[keys.length - 1]])){
+        if (k.includes(keys[keys.length - 1])) {
+          if (keys.length > 1 && typeof json[keys[keys.length - 1]] === 'number' || isNaN(json[keys[keys.length - 1]])) {
             json[keys[keys.length - 1]] += value;
           }
-        }else if (keys.length == 1){
-          if(typeof json === 'number' || isNaN(json)){
+        } else if (keys.length == 1) {
+          if (typeof json === 'number' || isNaN(json)) {
             json += value;
           }
         }
-      }else{
+      } else {
         return "";
       }
     }
 
-    js_json_add_item_to_array({variable, item}){
+    js_json_add_item_to_array({ variable, item }) {
       let keys = variable.split('|');
-      if(keys.length >= 1 && jsons_values.has(keys[0])){
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
         let json = jsons_values.get(keys[0]);
-        for(let i = 1; i < keys.length - 1; i++){
-          if(typeof json[keys[i]] !== 'undefined'){
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
             json = json[keys[i]];
-          }else{
+          } else {
             return "";
           }
         }
 
         let k = Object.keys(json);
-        if(keys.length > 1 &&  k.includes(keys[keys.length - 1])){
-          if(typeof json[keys[keys.length - 1]] === 'object'){
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
+          if (typeof json[keys[keys.length - 1]] === 'object') {
             json[keys[keys.length - 1]].push(item);
           }
-        }else if (keys.length == 1){
-          if(typeof json === 'object'){
+        } else if (keys.length == 1) {
+          if (typeof json === 'object') {
             json.push(item);
           }
         }
-      }else{
+      } else {
         return "";
       }
     }
@@ -886,20 +1285,32 @@
           setTimeout(() => {
             isThrottled = false;
           }, 100);
-      }});
+        }
+      });
+
+      let upmenu = document.querySelector('.stage-header_stage-menu-wrapper_15JJt');
+      upmenu.addEventListener('click', function (event) {
+        setTimeout(() => {
+          let scene = document.querySelector('.stage_stage_1fD7k');
+          console.log(scene);
+        }, 50);
+      });
 
       //custom styles for monitors
       let styleMonitors = document.createElement('style');
-      styleMonitors.innerHTML = 
-      "[class^='monitor_monitor-container'] {" +
-      "background-color: transparent !important;" +
-      "border : none;" +
-      "}" + 
-      "[class^='monitor_large-'] {" +
-      "color : black;" +
-      "font-size : 18px;" +
-      "background-color: transparent !important;" +
-      "}";
+      styleMonitors.innerHTML =
+        // "[class^='monitor_monitor-container'] {" +
+        // "background-color: transparent !important;" +
+        // "border : none;" +
+        // "}" +
+        // "[class^='monitor_large-'] {" +
+        // "color : black;" +
+        // "font-size : 18px;" +
+        // "background-color: transparent !important;" +
+        // "}" +
+        ".khandamovA-hidden {" +
+        "display: none !important;" +
+        "}";
 
       document.body.insertBefore(styleMonitors, document.body.firstChild);
 
@@ -914,7 +1325,7 @@
             let json = this.dataStorage[i + 2];
             i += 2;
             jsons_values.set(name, JSON.parse(json));
-          }else if (v == '$restore_function'){
+          } else if (v == '$restore_function') {
             let name = this.dataStorage[i + 1];
             let success = this.dataStorage[i + 2] == 'true' ? true : false;
             let exec = this.dataStorage[i + 3];
@@ -923,19 +1334,38 @@
             let variables = JSON.parse(this.dataStorage[i + 6]);
 
             let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
-            , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec);
-            
+              , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec);
+
             functions.set(name, {
-              success : success,
-              exec : func,
-              isReturned : isReturned,
-              cArguments : cArguments,
-              variables : variables
+              success: success,
+              exec: func,
+              isReturned: isReturned,
+              cArguments: cArguments,
+              variables: variables
             });
             i += 6;
-          }else if (v == '$restore_styles'){
+          } else if (v == '$restore_styles') {
             elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
             i += 2;
+          }
+        }
+
+        for (let i = 0; i < this.dataStorage.length; i++) {
+          const v = this.dataStorage[i];
+          if (v == '$restore_widget') {
+            let variable = this.dataStorage[i + 1];
+            let widget = this.dataStorage[i + 2];
+            let style = this.dataStorage[i + 3];
+            let value = this.dataStorage[i + 4];
+            let visible = this.dataStorage[i + 5];
+            i += 5;
+            this.js_widgets_set_visible({variable, visible});
+            if(widget == 'combobox' || widget == 'radio-buttons'){
+              let source = value;
+              this.js_widgets_mutation2({variable, widget, style, source});
+            }else{
+              this.js_widgets_mutation({variable, widget, style, value});
+            }
           }
         }
       } catch {
@@ -943,7 +1373,7 @@
       }
     }
 
-    SaveFunctions(){
+    SaveFunctions() {
       let e = 0;
       while (true) {
         let index = this.dataStorage.indexOf('$restore_function', e);
@@ -1158,8 +1588,6 @@
     }
 
     getLists() {
-      document.elementFromPoint()
-
       const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type == 'list');
       const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type == 'list');
       const uniqueVars = [...new Set([...globalVars, ...localVars])];
@@ -1197,18 +1625,49 @@
       }
     }
 
-    getStyles() {
-      if(elements_styles.size == 0){
-        return [{
-          text : "select a style",
-          value : "select a style"
-        }];
-      }else{
-        let res = new Array;
-        elements_styles.forEach((v, k)=>{
+    getMutations() {
+      let res = [];
+      console.log('mutations', mutations);
+      let del = new Array;
+      mutations.forEach((v, k) => {
+        let f = document.querySelector('[id="'+v.element.id+'"]');
+
+        if (f == null) {
+          del.push(k);
+        } else {
           res.push({
-            text : k,
-            value : k
+            text: k,
+            value: v.id
+          });
+        }
+      });
+
+      del.forEach(x => {
+        mutations.delete(x);
+      })
+
+      if (res.length == 0) {
+        return [{
+          text: 'select a variable',
+          value: 'select a variable'
+        }]
+      } else {
+        return res;
+      }
+    }
+
+    getStyles() {
+      if (elements_styles.size == 0) {
+        return [{
+          text: "select a style",
+          value: "select a style"
+        }];
+      } else {
+        let res = new Array;
+        elements_styles.forEach((v, k) => {
+          res.push({
+            text: k,
+            value: k
           });
         });
         return res;
@@ -1239,68 +1698,71 @@
 
     getJSONByConstruct(targetid) {
       let id = this.getIdFocusBlock();
-      let blocks = this.getTarget(targetid).blocks._blocks;
-      if (id != null) {
-        let block = this.getBlockId(blocks, id);
+      let target = this.getTarget(targetid);
+      if (target != null) {
+        let blocks = target.blocks._blocks;
+        if (id != null) {
+          let block = this.getBlockId(blocks, id);
 
-        let results = { array: [] };
-        // this.helper(results, blocks, id);
+          let results = { array: [] };
+          // this.helper(results, blocks, id);
 
-        let variable;
-        let key;
-        if (block.success == true) {
-          this.getBlockParams(results, blocks, id);
-        }
+          let variable;
+          let key;
+          if (block.success == true) {
+            this.getBlockParams(results, blocks, id);
+          }
 
-        let json_var = null;
-        let answer = [];
+          let json_var = null;
+          let answer = [];
 
-        if (results.array.length >= 2 && jsons_values.has(results.array[results.array.length - 1])) {
-          json_var = jsons_values.get(results.array[results.array.length - 1]);
-        }
+          if (results.array.length >= 2 && jsons_values.has(results.array[results.array.length - 1])) {
+            json_var = jsons_values.get(results.array[results.array.length - 1]);
+          }
 
-        if (json_var != null) {
-          for (let i = 1; i < results.array.length - 1; i++) {
-            let value = results.array[results.array.length - 1 - i];
-            if (typeof json_var[value] !== 'undefined') {
-              json_var = json_var[value];
-            } else {
+          if (json_var != null) {
+            for (let i = 1; i < results.array.length - 1; i++) {
+              let value = results.array[results.array.length - 1 - i];
+              if (typeof json_var[value] !== 'undefined') {
+                json_var = json_var[value];
+              } else {
+                answer = [{
+                  text: 'failed',
+                  value: 'failed'
+                }];
+                return answer;
+                break;
+              }
+            }
+
+            if (typeof json_var === 'number') {
               answer = [{
-                text: 'failed',
-                value: 'failed'
+                text: 'select a param',
+                value: 'select a param'
               }];
+            } else {
+              let keys = Object.keys(json_var);
+              for (let i = 0; i < keys.length; i++) {
+                answer.push({
+                  text: keys[i],
+                  value: keys[i]
+                });
+              }
+
+              if (keys.length == 0) {
+                answer.push({
+                  text: 'object haven\'t params',
+                  value: 'object haven\'t params'
+                });
+              }
+
               return answer;
-              break;
             }
           }
 
-          if (typeof json_var === 'number') {
-            answer = [{
-              text: 'select a param',
-              value: 'select a param'
-            }];
-          } else {
-            let keys = Object.keys(json_var);
-            for (let i = 0; i < keys.length; i++) {
-              answer.push({
-                text: keys[i],
-                value: keys[i]
-              });
-            }
+          console.log('getJSONByConstruct', id, results, vm);
 
-            if (keys.length == 0) {
-              answer.push({
-                text: 'object haven\'t params',
-                value: 'object haven\'t params'
-              });
-            }
-
-            return answer;
-          }
         }
-
-        console.log('getJSONByConstruct', id, results, vm);
-
       }
       return [
         {
@@ -1310,7 +1772,7 @@
       ];
     }
 
-    getFuncs(){
+    getFuncs() {
       let res = [];
       functions.forEach((v, k) => {
         res.push({
@@ -1674,7 +2136,7 @@
       }
     }
 
-    js_remove_func(args, util){
+    js_remove_func(args, util) {
       functions.delete(args.name);
       this.SaveFunctions();
     }
@@ -1814,13 +2276,13 @@
     }
 
     js_json_create({ name, value }) {
-        try {
-          let json = JSON.parse(value);
-          jsons_values.set(name, json);
-          return true;
-        } catch {
-          return false;
-        }
+      try {
+        let json = JSON.parse(value);
+        jsons_values.set(name, json);
+        return true;
+      } catch {
+        return false;
+      }
       return false;
     }
 
