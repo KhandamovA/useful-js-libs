@@ -64,7 +64,7 @@
 
       setTimeout(()=>{
         this.init({styleMonitors});
-      }, 20);
+      }, 50);
 
       return {
         id: 'KhandamovA',
@@ -99,6 +99,7 @@
               },
             }
           },
+          "---",
           {
             opcode: 'js_init_func',
             blockType: Scratch.BlockType.COMMAND,
@@ -166,6 +167,7 @@
               },
             }
           },
+          "---",
           {
             opcode: 'js_ret_convert_var',
             blockType: Scratch.BlockType.REPORTER,
@@ -232,6 +234,7 @@
               }
             }
           },
+          "---",
           {
             opcode: 'js_json_get_var',
             blockType: Scratch.BlockType.REPORTER,
@@ -378,6 +381,7 @@
               }
             }
           },
+          "---",
           {
             opcode: 'js_json_remove_all_vars',
             blockType: Scratch.BlockType.COMMAND,
@@ -409,6 +413,19 @@
               sender: {
                 type: Scratch.ArgumentType.STRING,
                 menu: 'sender'
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_set_main_style',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'set main stylesheet [style]',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              style: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
               },
             }
           },
@@ -452,7 +469,7 @@
           {
             opcode: 'js_widgets_mutation',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'mutation [variable] to widget [widget] style [style] value [value]',
+            text: 'mutate [variable] to widget [widget] style [style] value [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -475,7 +492,7 @@
           {
             opcode: 'js_widgets_mutation2',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'mutation [variable] to widget [widget] style [style] source list [source]',
+            text: 'mutate [variable] to widget [widget] style [style] source list [source]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -510,6 +527,88 @@
               },
             }
           },
+          '---',
+          {
+            opcode: 'js_widgets_set_attribute',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'widget [variable] set attribute [attr] value [value]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              attr: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+              value: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_get_attribute',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'widget [variable] get attribute [attr]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              attr: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+            }
+          },
+          '---',
+          {
+            opcode: 'js_widgets_add_class',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'widget [variable] add class [class_]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              class_: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_del_class',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'widget [variable] remove class [class_]',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              class_: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+            }
+          },
+          {
+            opcode: 'js_widgets_get_class',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'widget [variable] all classes',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_mutations'
+              },
+              class_: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue : ''
+              },
+            }
+          },
+          '---',
           {
             opcode: 'js_widgets_is_mutation',
             blockType: Scratch.BlockType.REPORTER,
@@ -647,7 +746,7 @@
         if (index == -1) {
           break;
         } else {
-          this.dataStorage.splice(index, 6);
+          this.dataStorage.splice(index, 7);
         }
       }
     }
@@ -666,16 +765,19 @@
         }else{
           this.dataStorage.push(v.visible);
         }
+        this.dataStorage.push(v.classes);
       });
     }
 
     js_widgets_is_mutation({variable}){
+      let ret = false;
       mutations.forEach((v, k)=>{
         if(v.id == variable){
-          return true;
+          ret = true;
+          return;
         }
       });
-      return false;
+      return ret;
     }
 
     js_widgets_set_visible({ variable, visible }) {
@@ -711,8 +813,105 @@
       }
     }
 
+    js_widgets_set_attribute({variable, attr, value}){
+      this.getMutations();
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          v.element.setAttribute(attr, value);
+          return;
+        }
+      });
+    }
+
+    js_widgets_get_attribute({variable, attr}){
+      this.getMutations();
+      let ret = 'is not a widget';
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          ret = v.element.getAttribute(attr);
+          return;
+        }
+      });
+      return ret;
+    }
+
+    updateClassesWidget(widget, classList){
+      widget.classes = '';
+      for(let i = 0; i < classList.length; i++){
+        if(i == 0){
+          widget.classes += classList[i];
+        }else{
+          widget.classes += ',' + classList[i];
+        }
+      }
+    }
+
+    js_widgets_add_class({variable, class_}){
+      this.getMutations();
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          v.element.classList.add(class_);
+          this.updateClassesWidget(v, v.element.classList);
+          return;
+        }
+      });
+    }
+
+    js_widgets_del_class({variable, class_}){
+      this.getMutations();
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          v.element.classList.remove(class_);
+          this.updateClassesWidget(v, v.element.classList);
+          return;
+        }
+      });
+    }
+
+    js_widgets_get_class({variable, class_}){
+      this.getMutations();
+      let ret = 'is not a widget';
+      mutations.forEach((v, k)=>{
+        if(v.id == variable){
+          let all = v.element.classList;
+          ret = '';
+          for(let i = 0; i < all.length; i++){
+            ret += all[i] + " ";
+          }
+          return;
+        }
+      });
+      return ret;
+    }
+
     js_widgets_signal(args, util) {
       // console.log('signal', args);
+    }
+
+    js_widgets_set_main_style({style}){
+      let elem = document.querySelector('.khandanovA-main-style');
+      if(elem == null){
+        elem = document.createElement('style');
+        elem.classList.add('khandanovA-main-style');
+        elem.innerHTML = style;
+        document.body.insertBefore(elem, document.body.firstChild);
+      }else{
+        elem.innerHTML = style;
+      }
+
+      let e = 0;
+      while (true) {
+        let index = this.dataStorage.indexOf('$restore_main_style', e);
+        e = index;
+        if (index == -1) {
+          break;
+        } else {
+          this.dataStorage.splice(index, 2);
+        }
+      }
+
+      this.dataStorage.push('$restore_main_style');
+      this.dataStorage.push(style);
     }
 
     js_widgets_mutation({ variable, widget, style, value }) {
@@ -727,6 +926,7 @@
             mutations.forEach((v, k)=>{
               if(v.id == variable){
                 v.value = value;
+                return;
               }
             });
             break;
@@ -842,6 +1042,7 @@
             mutations.forEach((v, k)=>{
               if(v.id == variable){
                 v.value = value;
+                return;
               }
             });
             break;
@@ -875,6 +1076,7 @@
             mutations.forEach((v, k)=>{
               if(v.id == variable){
                 v.value = value;
+                return;
               }
             });
 
@@ -1351,6 +1553,8 @@
         "display: none !important;" +
         "}";
 
+        
+
       // document.body.insertBefore(styleMonitors, document.body.firstChild);
 
       /**
@@ -1386,6 +1590,17 @@
           } else if (v == '$restore_style') {
             elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
             i += 2;
+          } else if(v == '$restore_main_style'){
+            let elem = document.querySelector('.khandanovA-main-style');
+            if(elem == null){
+              elem = document.createElement('style');
+              elem.classList.add('khandanovA-main-style');
+              elem.innerHTML = this.dataStorage[i + 1];
+              document.body.insertBefore(elem, document.body.firstChild);
+            }else{
+              elem.innerHTML = style;
+            }
+            i += 1;
           }
         }
 
@@ -1397,6 +1612,7 @@
             let style = this.dataStorage[i + 3];
             let value = this.dataStorage[i + 4];
             let visible = this.dataStorage[i + 5];
+            let classes = this.dataStorage[i + 6];
             i += 5;
             if(widget == 'combobox' || widget == 'radio-buttons'){
               let source = value;
@@ -1405,6 +1621,12 @@
               this.js_widgets_mutation({variable, widget, style, value});
             }
             this.js_widgets_set_visible({variable, visible});
+
+            let clss = classes.split(',');
+            for(let i = 0; i < clss.length; i++){
+              let class_ = clss[i].replace(' ', '');
+              this.js_widgets_add_class({variable, class_});
+            }
           }
         }
       } catch {
