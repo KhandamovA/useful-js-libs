@@ -1589,8 +1589,8 @@
     }
 
     getVars(targetid) {
-      const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list');
-      const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type != 'list');
+      const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.type != 'list' && x.type != 'broadcast_msg');
+      const localVars = Object.values(vm.editingTarget.variables).filter(x => x.type != 'list' != 'broadcast_msg');
       const uniqueVars = [...new Set([...globalVars, ...localVars])];
       if (uniqueVars.length === 0) {
         return [
