@@ -817,6 +817,11 @@
       this.getMutations();
       mutations.forEach((v, k)=>{
         if(v.id == variable){
+          attr.replace(' ', '');
+          if(value == undefined){
+            value = '';
+          }
+          if(attr != undefined && attr != '')
           v.element.setAttribute(attr, value);
           return;
         }
@@ -850,6 +855,8 @@
       this.getMutations();
       mutations.forEach((v, k)=>{
         if(v.id == variable){
+          class_.replace(' ', '');
+          if(class_ != undefined && class_ != '')
           v.element.classList.add(class_);
           this.updateClassesWidget(v, v.element.classList);
           return;
@@ -861,6 +868,8 @@
       this.getMutations();
       mutations.forEach((v, k)=>{
         if(v.id == variable){
+          class_.replace(' ', '');
+          if(class_ != undefined && class_ != '')
           v.element.classList.remove(class_);
           this.updateClassesWidget(v, v.element.classList);
           return;
