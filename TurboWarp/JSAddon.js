@@ -178,6 +178,17 @@
             }
           },
           {
+            opcode: 'js_exec_ret_raw_code',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'return code by function [func]',
+            arguments: {
+              func: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'get_funcs'
+              },
+            }
+          },
+          {
             opcode: 'js_ret_all_functions',
             blockType: Scratch.BlockType.REPORTER,
             text: 'all functions'
@@ -380,6 +391,11 @@
             text: 'save all json vars in dataStorage',
             arguments: {
             }
+          },
+          {
+            opcode: 'js_ret_all_jsons',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'all json variables'
           },
           "---",
           labelblock('Extra widgets'),
@@ -1236,6 +1252,14 @@
       } else {
         return "";
       }
+    }
+
+    js_ret_all_jsons(){
+      let ret = '';
+      jsons_values.forEach((v,k)=>{
+        ret += k + ' ';
+      });
+      return ret;
     }
 
     isFloat(n) {
@@ -2288,6 +2312,17 @@
         }
       });
       return ret;
+    }
+
+    js_exec_ret_raw_code({func}){
+      if(functions.has(func)){
+        let v = functions.get(func);
+        let textcode = v.exec.toString();
+        let beg = textcode.indexOf('{');
+        textcode = textcode.substring(beg + 1, textcode.length).slice(0, -1).replace('\n', ' ');
+        return textcode;
+      }
+      return "is not a function";
     }
 
     js_json_create({ name, value }) {
