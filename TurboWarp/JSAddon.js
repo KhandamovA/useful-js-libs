@@ -712,7 +712,7 @@
     }
 
     js_widgets_signal(args, util) {
-      console.log('signal', args);
+      // console.log('signal', args);
     }
 
     js_widgets_mutation({ variable, widget, style, value }) {
@@ -1037,7 +1037,7 @@
     }
 
     testbutton() {
-      console.log('button');
+      // console.log('button');
     }
 
     js_json_remove_all_vars() {
@@ -1334,7 +1334,7 @@
       upmenu.addEventListener('click', function (event) {
         setTimeout(() => {
           let scene = document.querySelector('.stage_stage_1fD7k');
-          console.log(scene);
+          // console.log(scene);
         }, 50);
       });
 
@@ -1666,7 +1666,7 @@
 
     getMutations() {
       let res = [];
-      console.log('mutations', mutations);
+      // // console.log('mutations', mutations);
       let del = new Array;
       mutations.forEach((v, k) => {
         let f = document.querySelector('[id="'+v.element.id+'"]');
@@ -1799,7 +1799,7 @@
             }
           }
 
-          console.log('getJSONByConstruct', id, results, vm);
+          // console.log('getJSONByConstruct', id, results, vm);
 
         }
       }
@@ -1831,9 +1831,9 @@
     }
 
     js_exec_code(args) {
-      console.log(args.js);
+      // console.log(args.js);
       try {
-        console.log(args);
+        // console.log(args);
         let js = args.js + '';
         let n = 0; let e = 0;
         let className = '';
@@ -1844,7 +1844,7 @@
           //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
           n = js.indexOf('new', e);
           e = n;
-          console.log('new find', n);
+          // console.log('new find', n);
           if (n != -1) {
             let cls1 = js.indexOf('(');
             let cls2 = js.indexOf(';');
@@ -1872,7 +1872,7 @@
             break;
           }
 
-          console.log('classname', className, 'new var', Scratch);
+          // console.log('classname', className, 'new var', Scratch);
 
           if (cond != -1) {
             let begA = js.indexOf('\'', cond);
@@ -1880,7 +1880,7 @@
             let begA2 = js.indexOf('\"', cond);
             let endA2 = js.indexOf('\"', begA2 + 1);
 
-            console.log('find argument', begA, endA, scodeEnd)
+            // console.log('find argument', begA, endA, scodeEnd)
 
 
             if (begA != -1 && endA != -1 && begA < scodeEnd && endA < scodeEnd) {
@@ -1893,7 +1893,7 @@
 
             if (className == 'GVar') {
               const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name == argument);
-              console.log('setValue', globalVars);
+              // console.log('setValue', globalVars);
               if (globalVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + globalVars[0].value + "\"")
               } else {
@@ -1907,17 +1907,17 @@
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
               }
             }
-            console.log('argument', argument);
+            // console.log('argument', argument);
 
             className = '';
           }
         }
-        console.log('itog', js);
+        // console.log('itog', js);
 
         let func = new Function(js);
         if (args.js.includes('return')) {
           const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
-          console.log('vars', vm.editingTarget.variables);
+          // console.log('vars', vm.editingTarget.variables);
           let answer = func();
           if (!this.isFloat(answer)) {
             // answer = answer;
@@ -1938,9 +1938,9 @@
     }
 
     js_exec_code_ret(args) {
-      console.log(args);
+      // console.log(args);
       try {
-        console.log(args);
+        // console.log(args);
         let js = args.js + '';
         let n = 0; let e = 0;
         let className = '';
@@ -1951,7 +1951,7 @@
           //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
           n = js.indexOf('new', e);
           e = n;
-          console.log('new find', n);
+          // console.log('new find', n);
           if (n != -1) {
             let cls1 = js.indexOf('(');
             let cls2 = js.indexOf(';');
@@ -1979,7 +1979,7 @@
             break;
           }
 
-          console.log('classname', className, 'new var', Scratch);
+          // console.log('classname', className, 'new var', Scratch);
 
           if (cond != -1) {
             let begA = js.indexOf('\'', cond);
@@ -1987,7 +1987,7 @@
             let begA2 = js.indexOf('\"', cond);
             let endA2 = js.indexOf('\"', begA2 + 1);
 
-            console.log('find argument', begA, endA, scodeEnd)
+            // console.log('find argument', begA, endA, scodeEnd)
 
 
             if (begA != -1 && endA != -1 && begA < scodeEnd && endA < scodeEnd) {
@@ -2000,7 +2000,7 @@
 
             if (className == 'GVar') {
               const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.name == argument);
-              console.log('setValue', globalVars);
+              // console.log('setValue', globalVars);
               if (globalVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + globalVars[0].value + "\"");
               } else {
@@ -2014,17 +2014,17 @@
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
               }
             }
-            console.log('argument', argument);
+            // console.log('argument', argument);
 
             className = '';
           }
         }
-        console.log('itog', js);
+        // console.log('itog', js);
 
         let func = new Function(js);
         if (args.js.includes('return')) {
           const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
-          console.log('vars', vm.editingTarget.variables);
+          // console.log('vars', vm.editingTarget.variables);
           let answer = func();
           if (!this.isFloat(answer)) {
             // answer = '\'' + answer + '\'';
@@ -2040,7 +2040,7 @@
     }
 
     js_init_func(args) {
-      console.log(args);
+      // console.log(args);
       let access = true;
       if (!functions.has(args.name)) {
         access = true;
@@ -2066,7 +2066,7 @@
             //let g = new GVar(\'my variable\'); let l = new LVar(\'my variable\'); return \'hello JavaScript! \' + g + \' \' + l;
             n = js.indexOf('new', e);
             e = n;
-            console.log('new find', n);
+            // console.log('new find', n);
             if (n != -1) {
               let cls1 = js.indexOf('(');
               let cls2 = js.indexOf(';');
@@ -2094,7 +2094,7 @@
               break;
             }
 
-            console.log('classname', className, 'new var', Scratch);
+            // console.log('classname', className, 'new var', Scratch);
 
             if (cond != -1) {
               let begA = js.indexOf('\'', cond);
@@ -2102,7 +2102,7 @@
               let begA2 = js.indexOf('\"', cond);
               let endA2 = js.indexOf('\"', begA2 + 1);
 
-              console.log('find argument', begA, endA, scodeEnd)
+              // console.log('find argument', begA, endA, scodeEnd)
 
 
               if (begA != -1 && endA != -1 && begA < scodeEnd && endA < scodeEnd) {
@@ -2135,14 +2135,14 @@
                   where: 1
                 });
               }
-              console.log('argument', argument);
+              // console.log('argument', argument);
 
               className = '';
             }
           }
 
 
-          console.log('itog', js);
+          // console.log('itog', js);
 
           let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
             , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', js);
@@ -2181,7 +2181,7 @@
     }
 
     js_exec_code_from_func_ret(args) {
-      console.log(args);
+      // console.log(args);
 
       if (functions.has(args.func)) {
         const e = functions.get(args.func);
@@ -2224,7 +2224,7 @@
     }
 
     js_exec_code_from_func(args) {
-      console.log(args);
+      // console.log(args);
 
       if (functions.has(args.func)) {
         const e = functions.get(args.func);
@@ -2289,7 +2289,7 @@
           v = localVars[0];
           type = "LVar";
         }
-        console.log('until', until.target.lookupVariableById(args.variable), until);
+        // console.log('until', until.target.lookupVariableById(args.variable), until);
         return "let any_name_var = new " + type + "('" + v.name + "');";
       } catch {
         return 'error';
