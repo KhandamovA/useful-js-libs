@@ -1541,13 +1541,14 @@
         }
       });
 
-      let upmenu = document.querySelector('.stage-header_stage-menu-wrapper_15JJt');
-      upmenu.addEventListener('click', function (event) {
-        setTimeout(() => {
-          let scene = document.querySelector('.stage_stage_1fD7k');
-          // console.log(scene);
-        }, 50);
-      });
+      // Не работает в экспорте
+      // let upmenu = document.querySelector('.stage-header_stage-menu-wrapper_15JJt');
+      // upmenu.addEventListener('click', function (event) {
+      //   setTimeout(() => {
+      //     let scene = document.querySelector('.stage_stage_1fD7k');
+      //     // console.log(scene);
+      //   }, 50);
+      // });
 
       //custom styles for monitors
       // let styleMonitors = document.createElement('style');
@@ -1638,6 +1639,7 @@
             }
           }
         }
+        console.log('JSAddon is loaded');
       } catch {
 
       }
