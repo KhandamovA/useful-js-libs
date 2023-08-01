@@ -51,14 +51,14 @@
       let styleMonitors = document.createElement('style');
       
       styleMonitors.innerHTML =
-        "[class^='monitor_monitor-container'] {" +
-        "background-color: transparent !important;" +
-        "border : none;" +
-        "display: none;" +
-        "}" +
-        ".khandamovA-hidden {" +
-        "display: none !important;" +
-        "}";
+      "[class^='monitor_monitor-container'] {" +
+      "background-color: transparent !important;" +
+      "border : none;" +
+      "display: none;" +
+      "}" +
+      ".khandamovA-hidden {" +
+      "display: none !important;" +
+      "}";
 
       document.body.insertBefore(styleMonitors, document.body.firstChild);
 
@@ -925,6 +925,11 @@
 
     js_widgets_mutation({ variable, widget, style, value }) {
       let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
+
+      let res_integration = document.querySelectorAll('[class^="sc-monitor-root"]');
+      if(res_integration.length > 0){
+        res = res_integration;
+      }
       for (let i = 0; i < res.length; i++) {
         let id = res[i].getAttribute('data-id');
         if (id == variable) {
@@ -943,16 +948,38 @@
 
           let monitor_default = res[i].querySelectorAll('[class^="monitor_default"');
           let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
+          let monitor_default_integration = res[i].querySelectorAll('[class^="sc-monitor-default"');
+          let monitor_large_integration = res[i].querySelectorAll('[class^="sc-monitor-large"');
 
-          if (monitor_large.length > 0) {
-            monitor_large[0].style = "display : none; background-color: transparent; border: none;";
-            monitor_large[0].parentElement.style += "display : none; background-color: transparent; border: none;";
+          if(monitor_default_integration.length > 0){
+            monitor_default = monitor_default_integration;
+            monitor_default[0].style = monitor_default[0].parentElement.getAttribute('style') + "; color: white; display: none; background-color: transparent; border: none;";
+            // console.log('monitor_default',monitor_default[0].parentElement.style);
+          }else{
+            if (monitor_default.length > 0) {
+              monitor_default[0].style += "color: white; display: none; background-color: transparent; border: none;";
+              monitor_default[0].parentElement.style += "color: white; display : none; background-color: transparent; border: none;";
           }
-          if (monitor_default.length > 0) {
-            monitor_default[0].style = "display : none; background-color: transparent; border: none;";
-            monitor_default[0].parentElement.style += "display : none; background-color: transparent; border: none;";
           }
 
+
+          if(monitor_large_integration.length > 0){
+            monitor_large = monitor_large_integration;
+            monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
+            monitor_large[0].parentElement.style = monitor_large[0].parentElement.getAttribute('style') + "color: white; background-color: transparent; border: none;";
+            // console.log('monitor_large',monitor_large[0].parentElement.style);
+          }else{
+            if (monitor_large.length > 0) {
+              monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
+              monitor_large[0].parentElement.style = "color: white; display : none; background-color: transparent; border: none;";
+          }
+          }
+
+
+
+          
+
+          
           let elem = document.createElement('input');
           elem.type = widget;
           elem.classList.add('khandamovA-mutation-element');
@@ -1024,6 +1051,12 @@
 
     js_widgets_mutation2({ variable, widget, style, source }) {
       let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
+
+      let res_integration = document.querySelectorAll('[class^="sc-monitor-root"]');
+      if(res_integration.length > 0){
+        res = res_integration;
+      }
+
       for (let i = 0; i < res.length; i++) {
         let id = res[i].getAttribute('data-id');
         if (id == variable) {
@@ -1094,14 +1127,31 @@
 
           let monitor_default = res[i].querySelectorAll('[class^="monitor_default"');
           let monitor_large = res[i].querySelectorAll('[class^="monitor_large"');
+          let monitor_default_integration = res[i].querySelectorAll('[class^="sc-monitor-default"');
+          let monitor_large_integration = res[i].querySelectorAll('[class^="sc-monitor-large"');
 
-          if (monitor_large.length > 0) {
-            monitor_large[0].style = "display : none; background-color: transparent; border: none;";
-            monitor_large[0].parentElement.style += "display : none; background-color: transparent; border: none;";
+          if(monitor_default_integration.length > 0){
+            monitor_default = monitor_default_integration;
+            monitor_default[0].style = monitor_default[0].parentElement.getAttribute('style') + "; color: white; display: none; background-color: transparent; border: none;";
+            // console.log('monitor_default',monitor_default[0].parentElement.style);
+          }else{
+            if (monitor_default.length > 0) {
+              monitor_default[0].style += "color: white; display: none; background-color: transparent; border: none;";
+              monitor_default[0].parentElement.style += "color: white; display : none; background-color: transparent; border: none;";
           }
-          if (monitor_default.length > 0) {
-            monitor_default[0].style = "display : none; background-color: transparent; border: none;";
-            monitor_default[0].parentElement.style += "display : none; background-color: transparent; border: none;";
+          }
+
+
+          if(monitor_large_integration.length > 0){
+            monitor_large = monitor_large_integration;
+            monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
+            monitor_large[0].parentElement.style = monitor_large[0].parentElement.getAttribute('style') + "color: white; background-color: transparent; border: none;";
+            // console.log('monitor_large',monitor_large[0].parentElement.style);
+          }else{
+            if (monitor_large.length > 0) {
+              monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
+              monitor_large[0].parentElement.style = "color: white; display : none; background-color: transparent; border: none;";
+          }
           }
 
           /**
@@ -1636,6 +1686,20 @@
             for(let i = 0; i < clss.length; i++){
               let class_ = clss[i].replace(' ', '');
               this.js_widgets_add_class({variable, class_});
+            }
+
+            if(i == this.dataStorage.length - 1){
+              mutations.forEach((v, k)=>{
+                if(v.id == variable){
+                  /**
+                   * @type {HTMLElement}
+                   */
+                  let e = v.element;
+                  let buf = e.value;
+                  e.value = 'fuck';
+                  e.value = buf;
+                }
+              })
             }
           }
         }
