@@ -1631,21 +1631,26 @@
           } else if (v == '$restore_function') {
             let name = this.dataStorage[i + 1];
             let success = this.dataStorage[i + 2] == 'true' ? true : false;
-            let exec = this.dataStorage[i + 3];
-            let isReturned = this.dataStorage[i + 4] == 'true' ? true : false;
-            let cArguments = this.dataStorage[i + 5];
-            let variables = JSON.parse(this.dataStorage[i + 6]);
+            let isReturned = this.dataStorage[i + 3] == 'true' ? true : false;
+            let cArguments = this.dataStorage[i + 4];
+            let variables = JSON.parse(this.dataStorage[i + 5]);
+            let textcode = this.dataStorage[i + 6];
 
-            let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
-              , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec);
 
-            functions.set(name, {
-              success: success,
-              exec: func,
-              isReturned: isReturned,
-              cArguments: cArguments,
-              variables: variables
-            });
+            let js = textcode;
+            let quest = 'yes';
+            this.js_init_func({name , js, quest});
+            // let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
+            //   , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec).bind(this);
+
+            // functions.set(name, {
+            //   success: success,
+            //   exec: func,
+            //   isReturned: isReturned,
+            //   cArguments: cArguments,
+            //   variables: variables,
+            //   textcode : exec
+            // });
             i += 6;
           } else if (v == '$restore_style') {
             elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
@@ -1725,16 +1730,10 @@
         this.dataStorage.push('$restore_function');
         this.dataStorage.push(k);
         this.dataStorage.push(v.success);
-        /**
-         * @type {string}
-         */
-        let textcode = v.exec.toString();
-        let beg = textcode.indexOf('{');
-        textcode = textcode.substring(beg + 1, textcode.length).slice(0, -1).replace('\n', ' ');
-        this.dataStorage.push(textcode);
         this.dataStorage.push(v.isReturned);
         this.dataStorage.push(v.cArguments);
         this.dataStorage.push(JSON.stringify(v.variables));
+        this.dataStorage.push(v.textcode);
       });
     }
 
@@ -2301,14 +2300,14 @@
               if (globalVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + globalVars[0].value + "\"");
               } else {
-                js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
+                js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'none\'');
               }
             } else if (className == 'LVar') {
               const localVars = Object.values(vm.editingTarget.variables).filter(x => x.name == argument);
               if (localVars.length > 0) {
                 js = this.replaceSubstringByIndex(js, n, scodeEnd, "\"" + localVars[0].value + "\"");
               } else {
-                js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'\'');
+                js = this.replaceSubstringByIndex(js, n, scodeEnd, '\'none\'');
               }
             }
             // console.log('argument', argument);
@@ -2323,12 +2322,10 @@
           const globalVars = Object.values(vm.runtime.getTargetForStage().variables).filter(x => x.id == args.variable);
           // console.log('vars', vm.editingTarget.variables);
           let answer = func();
-          if (!this.isFloat(answer)) {
-            // answer = '\'' + answer + '\'';
-          }
           return answer;
         } else {
           func();
+          return "function not returned";
         }
       } catch {
         return 'error';
@@ -2442,7 +2439,7 @@
           // console.log('itog', js);
 
           let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
-            , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', js);
+            , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', js).bind(this);
 
           if (vars_.length > 32) {
             functions.set(args.name, {
@@ -2450,7 +2447,8 @@
               exec: () => { return 'error'; },
               isReturned: js.includes('return'),
               cArguments: vars_.length,
-              variables: vars_
+              variables: vars_,
+              textcode : args.js
             });
           } else {
             functions.set(args.name, {
@@ -2458,7 +2456,8 @@
               exec: func,
               isReturned: js.includes('return'),
               cArguments: vars_.length,
-              variables: vars_
+              variables: vars_,
+              textcode : args.js
             });
           }
 
@@ -2614,10 +2613,7 @@
     js_exec_ret_raw_code({func}){
       if(functions.has(func)){
         let v = functions.get(func);
-        let textcode = v.exec.toString();
-        let beg = textcode.indexOf('{');
-        textcode = textcode.substring(beg + 1, textcode.length).slice(0, -1).replace('\n', ' ');
-        return textcode;
+        return v.textcode;
       }
       return "is not a function";
     }
