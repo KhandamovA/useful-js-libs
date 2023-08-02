@@ -49,21 +49,23 @@
   class JSAddon {
     getInfo() {
       let styleMonitors = document.createElement('style');
-      
+
       styleMonitors.innerHTML =
-      "[class^='monitor_monitor-container'] {" +
-      "background-color: transparent !important;" +
-      "border : none;" +
-      "display: none;" +
-      "}" +
-      ".khandamovA-hidden {" +
-      "display: none !important;" +
-      "}";
+        "[class^='monitor_monitor-container'] {" +
+        "background-color: transparent !important;" +
+        "border : none;" +
+        "display: none;" +
+        "}" +
+        ".khandamovA-hidden {" +
+        "display: none !important; }" +
+        "[class^='sc-monitor-overlay'] {" +
+        "display : none;" +
+        "}";
 
       document.body.insertBefore(styleMonitors, document.body.firstChild);
 
-      setTimeout(()=>{
-        this.init({styleMonitors});
+      setTimeout(() => {
+        this.init({ styleMonitors });
       }, 50);
 
       return {
@@ -425,7 +427,7 @@
             arguments: {
               style: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -539,11 +541,11 @@
               },
               attr: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
               value: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -558,7 +560,7 @@
               },
               attr: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -574,7 +576,7 @@
               },
               class_: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -589,7 +591,7 @@
               },
               class_: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -604,7 +606,7 @@
               },
               class_: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue : ''
+                defaultValue: ''
               },
             }
           },
@@ -729,16 +731,16 @@
       return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
     }
 
-    js_widgets_all(){
+    js_widgets_all() {
       this.getMutations();
       let res = '';
-      mutations.forEach((v, k)=>{
+      mutations.forEach((v, k) => {
         res += k + ' ';
       })
       return res;
     }
 
-    js_widgets_delete(){
+    js_widgets_delete() {
       let e = 0;
       while (true) {
         let index = this.dataStorage.indexOf('$restore_widget', e);
@@ -751,7 +753,7 @@
       }
     }
 
-    js_widgets_save(){
+    js_widgets_save() {
       this.js_widgets_delete();
 
       mutations.forEach((v, k) => {
@@ -760,19 +762,19 @@
         this.dataStorage.push(v.widget);
         this.dataStorage.push(v.style);
         this.dataStorage.push(v.value);
-        if(v.visible == undefined){
+        if (v.visible == undefined) {
           this.dataStorage.push('yes');
-        }else{
+        } else {
           this.dataStorage.push(v.visible);
         }
         this.dataStorage.push(v.classes);
       });
     }
 
-    js_widgets_is_mutation({variable}){
+    js_widgets_is_mutation({ variable }) {
       let ret = false;
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           ret = true;
           return;
         }
@@ -783,8 +785,8 @@
     js_widgets_set_visible({ variable, visible }) {
       this.getMutations();
 
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           if (visible == 'yes') {
             v.element.classList.remove('khandamovA-hidden');
           } else {
@@ -813,26 +815,26 @@
       }
     }
 
-    js_widgets_set_attribute({variable, attr, value}){
+    js_widgets_set_attribute({ variable, attr, value }) {
       this.getMutations();
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           attr.replace(' ', '');
-          if(value == undefined){
+          if (value == undefined) {
             value = '';
           }
-          if(attr != undefined && attr != '')
-          v.element.setAttribute(attr, value);
+          if (attr != undefined && attr != '')
+            v.element.setAttribute(attr, value);
           return;
         }
       });
     }
 
-    js_widgets_get_attribute({variable, attr}){
+    js_widgets_get_attribute({ variable, attr }) {
       this.getMutations();
       let ret = 'is not a widget';
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           ret = v.element.getAttribute(attr);
           return;
         }
@@ -840,51 +842,51 @@
       return ret;
     }
 
-    updateClassesWidget(widget, classList){
+    updateClassesWidget(widget, classList) {
       widget.classes = '';
-      for(let i = 0; i < classList.length; i++){
-        if(i == 0){
+      for (let i = 0; i < classList.length; i++) {
+        if (i == 0) {
           widget.classes += classList[i];
-        }else{
+        } else {
           widget.classes += ',' + classList[i];
         }
       }
     }
 
-    js_widgets_add_class({variable, class_}){
+    js_widgets_add_class({ variable, class_ }) {
       this.getMutations();
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           class_.replace(' ', '');
-          if(class_ != undefined && class_ != '')
-          v.element.classList.add(class_);
+          if (class_ != undefined && class_ != '')
+            v.element.classList.add(class_);
           this.updateClassesWidget(v, v.element.classList);
           return;
         }
       });
     }
 
-    js_widgets_del_class({variable, class_}){
+    js_widgets_del_class({ variable, class_ }) {
       this.getMutations();
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           class_.replace(' ', '');
-          if(class_ != undefined && class_ != '')
-          v.element.classList.remove(class_);
+          if (class_ != undefined && class_ != '')
+            v.element.classList.remove(class_);
           this.updateClassesWidget(v, v.element.classList);
           return;
         }
       });
     }
 
-    js_widgets_get_class({variable, class_}){
+    js_widgets_get_class({ variable, class_ }) {
       this.getMutations();
       let ret = 'is not a widget';
-      mutations.forEach((v, k)=>{
-        if(v.id == variable){
+      mutations.forEach((v, k) => {
+        if (v.id == variable) {
           let all = v.element.classList;
           ret = '';
-          for(let i = 0; i < all.length; i++){
+          for (let i = 0; i < all.length; i++) {
             ret += all[i] + " ";
           }
           return;
@@ -897,14 +899,14 @@
       // console.log('signal', args);
     }
 
-    js_widgets_set_main_style({style}){
+    js_widgets_set_main_style({ style }) {
       let elem = document.querySelector('.khandanovA-main-style');
-      if(elem == null){
+      if (elem == null) {
         elem = document.createElement('style');
         elem.classList.add('khandanovA-main-style');
         elem.innerHTML = style;
         document.body.insertBefore(elem, document.body.firstChild);
-      }else{
+      } else {
         elem.innerHTML = style;
       }
 
@@ -927,7 +929,7 @@
       let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
 
       let res_integration = document.querySelectorAll('[class^="sc-monitor-root"]');
-      if(res_integration.length > 0){
+      if (res_integration.length > 0) {
         res = res_integration;
       }
       for (let i = 0; i < res.length; i++) {
@@ -937,8 +939,8 @@
 
           if (mutation_element.length > 0) {
             mutation_element[0].value = value;
-            mutations.forEach((v, k)=>{
-              if(v.id == variable){
+            mutations.forEach((v, k) => {
+              if (v.id == variable) {
                 v.value = value;
                 return;
               }
@@ -951,35 +953,35 @@
           let monitor_default_integration = res[i].querySelectorAll('[class^="sc-monitor-default"');
           let monitor_large_integration = res[i].querySelectorAll('[class^="sc-monitor-large"');
 
-          if(monitor_default_integration.length > 0){
+          if (monitor_default_integration.length > 0) {
             monitor_default = monitor_default_integration;
             monitor_default[0].style = monitor_default[0].parentElement.getAttribute('style') + "; color: white; display: none; background-color: transparent; border: none;";
             // console.log('monitor_default',monitor_default[0].parentElement.style);
-          }else{
+          } else {
             if (monitor_default.length > 0) {
               monitor_default[0].style += "color: white; display: none; background-color: transparent; border: none;";
               monitor_default[0].parentElement.style += "color: white; display : none; background-color: transparent; border: none;";
-          }
+            }
           }
 
 
-          if(monitor_large_integration.length > 0){
+          if (monitor_large_integration.length > 0) {
             monitor_large = monitor_large_integration;
             monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
             monitor_large[0].parentElement.style = monitor_large[0].parentElement.getAttribute('style') + "color: white; background-color: transparent; border: none;";
             // console.log('monitor_large',monitor_large[0].parentElement.style);
-          }else{
+          } else {
             if (monitor_large.length > 0) {
               monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
               monitor_large[0].parentElement.style = "color: white; display : none; background-color: transparent; border: none;";
+            }
           }
-          }
 
 
 
-          
 
-          
+
+
           let elem = document.createElement('input');
           elem.type = widget;
           elem.classList.add('khandamovA-mutation-element');
@@ -1003,9 +1005,9 @@
             mutations.set(var_.name, {
               id: var_.id,
               element: elem,
-              widget : widget,
-              style : style,
-              value : value
+              widget: widget,
+              style: style,
+              value: value
             })
           } else if (widget == 'text') {
             let var_ = this.getVariableData(variable);
@@ -1021,9 +1023,9 @@
             mutations.set(var_.name, {
               id: var_.id,
               element: elem,
-              widget : widget,
-              style : style,
-              value : value
+              widget: widget,
+              style: style,
+              value: value
             })
           } else if (widget == 'checkbox') {
             let var_ = this.getVariableData(variable);
@@ -1036,9 +1038,9 @@
             mutations.set(var_.name, {
               id: var_.id,
               element: elem,
-              widget : widget,
-              style : style,
-              value : value
+              widget: widget,
+              style: style,
+              value: value
             });
           }
 
@@ -1053,7 +1055,7 @@
       let res = document.querySelectorAll('[class^="monitor_monitor-container"]');
 
       let res_integration = document.querySelectorAll('[class^="sc-monitor-root"]');
-      if(res_integration.length > 0){
+      if (res_integration.length > 0) {
         res = res_integration;
       }
 
@@ -1081,8 +1083,8 @@
               mutation_element_combobox.appendChild(e);
             }
 
-            mutations.forEach((v, k)=>{
-              if(v.id == variable){
+            mutations.forEach((v, k) => {
+              if (v.id == variable) {
                 v.value = value;
                 return;
               }
@@ -1115,8 +1117,8 @@
               mutation_element_radios.appendChild(l);
             }
 
-            mutations.forEach((v, k)=>{
-              if(v.id == variable){
+            mutations.forEach((v, k) => {
+              if (v.id == variable) {
                 v.value = value;
                 return;
               }
@@ -1130,28 +1132,28 @@
           let monitor_default_integration = res[i].querySelectorAll('[class^="sc-monitor-default"');
           let monitor_large_integration = res[i].querySelectorAll('[class^="sc-monitor-large"');
 
-          if(monitor_default_integration.length > 0){
+          if (monitor_default_integration.length > 0) {
             monitor_default = monitor_default_integration;
             monitor_default[0].style = monitor_default[0].parentElement.getAttribute('style') + "; color: white; display: none; background-color: transparent; border: none;";
             // console.log('monitor_default',monitor_default[0].parentElement.style);
-          }else{
+          } else {
             if (monitor_default.length > 0) {
               monitor_default[0].style += "color: white; display: none; background-color: transparent; border: none;";
               monitor_default[0].parentElement.style += "color: white; display : none; background-color: transparent; border: none;";
-          }
+            }
           }
 
 
-          if(monitor_large_integration.length > 0){
+          if (monitor_large_integration.length > 0) {
             monitor_large = monitor_large_integration;
             monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
             monitor_large[0].parentElement.style = monitor_large[0].parentElement.getAttribute('style') + "color: white; background-color: transparent; border: none;";
             // console.log('monitor_large',monitor_large[0].parentElement.style);
-          }else{
+          } else {
             if (monitor_large.length > 0) {
               monitor_large[0].style = "color: white; display: none; background-color: transparent; border: none;";
               monitor_large[0].parentElement.style = "color: white; display : none; background-color: transparent; border: none;";
-          }
+            }
           }
 
           /**
@@ -1191,9 +1193,9 @@
             mutations.set(var_.name, {
               id: var_.id,
               element: elem,
-              widget : widget,
-              style : style,
-              value : source
+              widget: widget,
+              style: style,
+              value: source
             })
 
           } else if (widget == 'radio-buttons') {
@@ -1234,9 +1236,9 @@
             mutations.set(var_.name, {
               id: var_.id,
               element: elem,
-              widget : widget,
-              style : style,
-              value : source
+              widget: widget,
+              style: style,
+              value: source
             })
           }
 
@@ -1515,9 +1517,9 @@
       }
     }
 
-    js_ret_all_jsons(){
+    js_ret_all_jsons() {
       let ret = '';
-      jsons_values.forEach((v,k)=>{
+      jsons_values.forEach((v, k) => {
         ret += k + ' ';
       });
       return ret;
@@ -1577,7 +1579,7 @@
     /**
      * Входная точка где создаются нужные инструменты и ресурсы
      */
-    init({styleMonitors}) {
+    init({ styleMonitors }) {
       /**
        * Событие для отслеживания элементов
        */
@@ -1602,18 +1604,10 @@
 
       //custom styles for monitors
       // let styleMonitors = document.createElement('style');
-      
-      styleMonitors.innerHTML =
-        "[class^='monitor_monitor-container'] {" +
-        "background-color: transparent !important;" +
-        "border : none;" +
-        // "display: none;" +
-        "}" +
-        ".khandamovA-hidden {" +
-        "display: none !important;" +
-        "}";
 
-        
+
+
+
 
       // document.body.insertBefore(styleMonitors, document.body.firstChild);
 
@@ -1639,7 +1633,7 @@
 
             let js = textcode;
             let quest = 'yes';
-            this.js_init_func({name , js, quest});
+            this.js_init_func({ name, js, quest });
             // let func = new Function('____0', '____1', '____2', '____3', '____4', '____5', '____6', '____7', '____8', '____9', '____10', '____11', '____12', '____13', '____14', '____15'
             //   , '____16', '____17', '____18', '____19', '____20', '____21', '____22', '____23', '____24', '____25', '____26', '____27', '____28', '____29', '____30', '____31', exec).bind(this);
 
@@ -1655,14 +1649,14 @@
           } else if (v == '$restore_style') {
             elements_styles.set(this.dataStorage[i + 1], this.dataStorage[i + 2]);
             i += 2;
-          } else if(v == '$restore_main_style'){
+          } else if (v == '$restore_main_style') {
             let elem = document.querySelector('.khandanovA-main-style');
-            if(elem == null){
+            if (elem == null) {
               elem = document.createElement('style');
               elem.classList.add('khandanovA-main-style');
               elem.innerHTML = this.dataStorage[i + 1];
               document.body.insertBefore(elem, document.body.firstChild);
-            }else{
+            } else {
               elem.innerHTML = style;
             }
             i += 1;
@@ -1679,23 +1673,23 @@
             let visible = this.dataStorage[i + 5];
             let classes = this.dataStorage[i + 6];
             i += 5;
-            if(widget == 'combobox' || widget == 'radio-buttons'){
+            if (widget == 'combobox' || widget == 'radio-buttons') {
               let source = value;
-              this.js_widgets_mutation2({variable, widget, style, source});
-            }else{
-              this.js_widgets_mutation({variable, widget, style, value});
+              this.js_widgets_mutation2({ variable, widget, style, source });
+            } else {
+              this.js_widgets_mutation({ variable, widget, style, value });
             }
-            this.js_widgets_set_visible({variable, visible});
+            this.js_widgets_set_visible({ variable, visible });
 
             let clss = classes.split(',');
-            for(let i = 0; i < clss.length; i++){
+            for (let i = 0; i < clss.length; i++) {
               let class_ = clss[i].replace(' ', '');
-              this.js_widgets_add_class({variable, class_});
+              this.js_widgets_add_class({ variable, class_ });
             }
 
-            if(i == this.dataStorage.length - 1){
-              mutations.forEach((v, k)=>{
-                if(v.id == variable){
+            if (i == this.dataStorage.length - 1) {
+              mutations.forEach((v, k) => {
+                if (v.id == variable) {
                   /**
                    * @type {HTMLElement}
                    */
@@ -1710,8 +1704,18 @@
         }
         console.log('JSAddon is loaded');
       } catch {
-
+        console.error('JSAddon is not loaded. Fatal error');
       }
+      
+      styleMonitors.innerHTML =
+        "[class^='monitor_monitor-container'] {" +
+        "background-color: transparent !important;" +
+        "border : none;" +
+        // "display: none;" +
+        "}" +
+        ".khandamovA-hidden {" +
+        "display: none !important;" +
+        "}";
     }
 
     SaveFunctions() {
@@ -1965,7 +1969,7 @@
       // // console.log('mutations', mutations);
       let del = new Array;
       mutations.forEach((v, k) => {
-        let f = document.querySelector('[id="'+v.element.id+'"]');
+        let f = document.querySelector('[id="' + v.element.id + '"]');
 
         if (f == null) {
           del.push(k);
@@ -2448,7 +2452,7 @@
               isReturned: js.includes('return'),
               cArguments: vars_.length,
               variables: vars_,
-              textcode : args.js
+              textcode: args.js
             });
           } else {
             functions.set(args.name, {
@@ -2457,7 +2461,7 @@
               isReturned: js.includes('return'),
               cArguments: vars_.length,
               variables: vars_,
-              textcode : args.js
+              textcode: args.js
             });
           }
 
@@ -2610,8 +2614,8 @@
       return ret;
     }
 
-    js_exec_ret_raw_code({func}){
-      if(functions.has(func)){
+    js_exec_ret_raw_code({ func }) {
+      if (functions.has(func)) {
         let v = functions.get(func);
         return v.textcode;
       }
