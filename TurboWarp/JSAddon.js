@@ -46,6 +46,13 @@
 
   let isThrottled = false;
 
+  let vm = Scratch.vm;
+
+  /**
+   * @type {JSAddon}
+   */
+  var addon;
+
   class JSAddon {
     getInfo() {
       let styleMonitors = document.createElement('style');
@@ -2652,7 +2659,8 @@
     }
   }
 
+  addon = new JSAddon();
+  
 
-
-  Scratch.extensions.register(new JSAddon());
+  Scratch.extensions.register(addon);
 })(Scratch);
