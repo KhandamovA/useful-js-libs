@@ -149,7 +149,7 @@
           {
             opcode: 'js_exec_code',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'return result to [variable] from js code [js]',
+            text: 'результат в [variable] из js кода [js]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -164,7 +164,7 @@
           {
             opcode: 'js_exec_code_ret',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'return result from js code [js]',
+            text: 'результат из js кода [js]',
             arguments: {
               js: {
                 type: Scratch.ArgumentType.STRING,
@@ -176,7 +176,7 @@
           {
             opcode: 'js_init_func',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'register function by name [name] from js code [js] reinit [quest]',
+            text: 'регистрация функции с именем [name] из js кода [js] переопределить [quest]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -195,7 +195,7 @@
           {
             opcode: 'js_remove_func',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete function by name [name]',
+            text: 'удалить функцию под именем [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -206,7 +206,7 @@
           {
             opcode: 'js_func_is_init',
             blockType: Scratch.BlockType.BOOLEAN,
-            text: 'function by name [name] is registered?',
+            text: 'функция с именем [name] зарегистрирована?',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -217,7 +217,7 @@
           {
             opcode: 'js_exec_code_from_func',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'return result to [variable] from js function by name [func]',
+            text: 'результат в [variable] из функции [func]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -232,7 +232,7 @@
           {
             opcode: 'js_exec_code_from_func_ret',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'return result from js function by name [func]',
+            text: 'результат из функции [func]',
             arguments: {
               func: {
                 type: Scratch.ArgumentType.STRING,
@@ -244,7 +244,7 @@
           {
             opcode: 'js_ret_convert_var',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'return [variable] as js variable',
+            text: '[variable] как js переменная',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -255,7 +255,7 @@
           {
             opcode: 'js_exec_ret_raw_code',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'return code by function [func]',
+            text: 'код функции [func]',
             arguments: {
               func: {
                 type: Scratch.ArgumentType.STRING,
@@ -266,14 +266,14 @@
           {
             opcode: 'js_ret_all_functions',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'all functions'
+            text: 'все функции'
           },
           "---",
           labelblock('JSON'),
           {
             opcode: 'js_json_create',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'create json var [name] with value [value]',
+            text: 'создать JSON [name] со значением [value]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -288,7 +288,7 @@
           {
             opcode: 'js_json_delete',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete json var [name]',
+            text: 'удалить JSON [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -299,7 +299,7 @@
           {
             opcode: 'js_json_exist',
             blockType: Scratch.BlockType.BOOLEAN,
-            text: 'json var [name] exist?',
+            text: 'JSON [name] существует?',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -311,7 +311,7 @@
           {
             opcode: 'js_json_get_var',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'json var [variable]',
+            text: 'JSON [variable]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -322,7 +322,7 @@
           {
             opcode: 'js_json_as_object',
             blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] as object param [param]',
+            text: '[variable] как объект > параметр [param]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -337,7 +337,7 @@
           {
             opcode: 'js_json_as_value',
             blockType: Scratch.BlockType.REPORTER,
-            text: '[variable] as value',
+            text: '[variable] значение',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -348,7 +348,7 @@
           {
             opcode: 'js_json_set_new_key',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] set param [key] with value [value]',
+            text: 'ключ [variable] установить параметр [key] в значение [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -367,7 +367,7 @@
           {
             opcode: 'js_json_remove_key',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] remove param [key]',
+            text: 'ключ [variable] удалить параметр [key]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -382,7 +382,7 @@
           {
             opcode: 'js_json_set_value',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] set value [value]',
+            text: 'ключ [variable] установить значение [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -397,7 +397,7 @@
           {
             opcode: 'js_json_change_value',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] change value [value]',
+            text: 'ключ [variable] изменить значение на [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -412,7 +412,7 @@
           {
             opcode: 'js_json_add_item_to_array',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] add item [item] to array',
+            text: 'ключ [variable] добавить элемент [item] в массив',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -427,7 +427,7 @@
           {
             opcode: 'js_json_remove_item_index',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] remove item #[item] in array',
+            text: 'ключ [variable] удалить элемент #[item] в массиве',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -442,7 +442,7 @@
           {
             opcode: 'js_json_remove_item_name',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'key [variable] remove items with name [item] in array',
+            text: 'ключ [variable] удалить элементы с именами [item] в массиве',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -458,28 +458,28 @@
           {
             opcode: 'js_json_remove_all_vars',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete all json vars from dataStorage',
+            text: 'удалить все JSON-ы из dataStorage',
             arguments: {
             }
           },
           {
             opcode: 'js_json_save_all_vars',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'save all json vars in dataStorage',
+            text: 'сохранить все JSON-ы в dataStorage',
             arguments: {
             }
           },
           {
             opcode: 'js_ret_all_jsons',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'all json variables'
+            text: 'все JSON-ы'
           },
           "---",
-          labelblock('Extra widgets'),
+          labelblock('Виджеты'),
           {
             opcode: 'js_widgets_signal',
             blockType: Scratch.BlockType.HAT,
-            text: 'When i receive signal at [sender] widget',
+            text: 'Когда я получу сигнал от [sender] виджета',
             isEdgeActivated: false,
             shouldRestartExistingThreads: true,
             arguments: {
@@ -492,7 +492,7 @@
           {
             opcode: 'js_widgets_set_main_style',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'set main stylesheet [style]',
+            text: 'установить главый лист стилей [style]',
             isEdgeActivated: false,
             shouldRestartExistingThreads: true,
             arguments: {
@@ -505,7 +505,7 @@
           {
             opcode: 'js_widgets_register_style',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'register css style [style] by name [name]',
+            text: 'регистрация css стиля [style] с именем [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -520,7 +520,7 @@
           {
             opcode: 'js_widgets_get_style',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'get css style by name [name]',
+            text: 'получить css стиль под именем [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -531,7 +531,7 @@
           {
             opcode: 'js_widgets_remove_style',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete css style by name [name]',
+            text: 'удалить css стиль под именем [name]',
             arguments: {
               name: {
                 type: Scratch.ArgumentType.STRING,
@@ -542,7 +542,7 @@
           {
             opcode: 'js_widgets_mutation',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'mutate [variable] to widget [widget] style [style] value [value]',
+            text: 'превратить [variable] в виджет [widget] стиль [style] значение [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -565,7 +565,7 @@
           {
             opcode: 'js_widgets_mutation2',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'mutate [variable] to widget [widget] style [style] source list [source]',
+            text: 'превратить [variable] в виджет [widget] стиль [style] лист [source]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -588,7 +588,7 @@
           {
             opcode: 'js_widgets_set_visible',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'widget [variable] set visible [visible]',
+            text: 'виджет [variable] видимость [visible]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -604,7 +604,7 @@
           {
             opcode: 'js_widgets_set_attribute',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'widget [variable] set attribute [attr] value [value]',
+            text: 'виджет [variable] установить атрибут [attr] в значение [value]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -623,7 +623,7 @@
           {
             opcode: 'js_widgets_get_attribute',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'widget [variable] get attribute [attr]',
+            text: 'виджет [variable] получить атрибут [attr]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -639,7 +639,7 @@
           {
             opcode: 'js_widgets_add_class',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'widget [variable] add class [class_]',
+            text: 'виджет [variable] добавить класс [class_]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -654,7 +654,7 @@
           {
             opcode: 'js_widgets_del_class',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'widget [variable] remove class [class_]',
+            text: 'виджет [variable] удалить класс [class_]',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -669,7 +669,7 @@
           {
             opcode: 'js_widgets_get_class',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'widget [variable] all classes',
+            text: 'виджет [variable] все классы',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -685,7 +685,7 @@
           {
             opcode: 'js_widgets_is_mutation',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'variable [variable] is widget?',
+            text: 'переменная [variable] является виджетом?',
             arguments: {
               variable: {
                 type: Scratch.ArgumentType.STRING,
@@ -693,24 +693,24 @@
               },
             }
           },
-          {
-            opcode: 'js_widgets_delete',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'delete mutant widgets from dataStorage',
-            arguments: {
-            }
-          },
-          {
-            opcode: 'js_widgets_save',
-            blockType: Scratch.BlockType.COMMAND,
-            text: 'save mutant widgets in dataStorage',
-            arguments: {
-            }
-          },
+          // {
+          //   opcode: 'js_widgets_delete',
+          //   blockType: Scratch.BlockType.COMMAND,
+          //   text: 'удалить все виджеты из dataStorage',
+          //   arguments: {
+          //   }
+          // },
+          // {
+          //   opcode: 'js_widgets_save',
+          //   blockType: Scratch.BlockType.COMMAND,
+          //   text: 'сохранить все виджеты в dataStorage',
+          //   arguments: {
+          //   }
+          // },
           {
             opcode: 'js_widgets_all',
             blockType: Scratch.BlockType.REPORTER,
-            text: 'all widgets',
+            text: 'все виджеты',
             arguments: {
             }
           },
@@ -719,7 +719,7 @@
           {
             opcode: 'js_custom_signal_recieve',
             blockType: Scratch.BlockType.HAT,
-            text: 'When i receive from [channel] channel signal [signal]',
+            text: 'Когда я получу из [channel] канала сигнал [signal]',
             isEdgeActivated: false,
             shouldRestartExistingThreads: true,
             arguments: {
@@ -736,7 +736,7 @@
           {
             opcode: 'js_custom_signal_send',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'send to [channel] channel [signal] signal',
+            text: 'отправить в [channel] канал [signal] сигнал',
             arguments: {
               channel: {
                 type: Scratch.ArgumentType.STRING,
@@ -753,7 +753,7 @@
           {
             opcode: 'js_custom_signal_create_channel',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'create channel [channel]',
+            text: 'создать канал [channel]',
             arguments: {
               channel: {
                 type: Scratch.ArgumentType.STRING,
@@ -764,7 +764,7 @@
           {
             opcode: 'js_custom_signal_delete_channel',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete channel [channel]',
+            text: 'удалить канал [channel]',
             arguments: {
               channel: {
                 type: Scratch.ArgumentType.STRING,
@@ -776,7 +776,7 @@
           {
             opcode: 'js_custom_create_signal',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'create signal [signal] for [channel] channel',
+            text: 'создать сигнал [signal] для [channel] канала',
             arguments: {
               signal: {
                 type: Scratch.ArgumentType.STRING,
@@ -791,7 +791,7 @@
           {
             opcode: 'js_custom_delete_signal',
             blockType: Scratch.BlockType.COMMAND,
-            text: 'delete from channel [channel] signal [signal]',
+            text: 'удалить из канала [channel] сигнал [signal]',
             arguments: {
               signal: {
                 type: Scratch.ArgumentType.STRING,
@@ -1356,6 +1356,7 @@
           }
 
           res[i].appendChild(elem);
+          this.js_widgets_save();
 
           break;
         }
@@ -1555,6 +1556,7 @@
 
 
           res[i].appendChild(elem);
+          this.js_widgets_save();
 
           break;
         }
@@ -2299,7 +2301,11 @@
 
       del.forEach(x => {
         mutations.delete(x);
-      })
+      });
+
+      if(del.length > 0){
+        this.js_widgets_save();
+      }
 
       if (res.length == 0) {
         return [{
