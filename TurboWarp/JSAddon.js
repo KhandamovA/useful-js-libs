@@ -1,34 +1,110 @@
-// /**
-//  * @typedef {Object} CustomElement
-//  * @property {string} id - Идентификатор элемента
-//  * @property {string} type - Тип элемента
-//  * @property {number} x - координата по Х
-//  * @property {number} y - координата по У
-//  * @property {number} w - Ширина элемента
-//  * @property {number} h - Высота элемента
-//  */
+//Описание типов для удобной работы с кодом
 
+/**
+ * @typedef {string} Channel Канал с набором сигналов
+ */
+
+/**
+ * @typedef {Array<string>} CustomSignals Набор пользовательских сигналов
+ */
+
+/**
+ * @typedef {string} FuncName Имя функции
+ */
+/**
+ * @typedef {string} JsonName Имя переменной JSON
+ */
+/**
+ * @typedef {string} StyleName Имя стиля
+ */
+/**
+ * @typedef {string} StyleContent CSS стиль (без классов)
+/**
+ * @typedef {string} MutantParentName Имя переменной родителя виджета
+ */
+
+/**
+ * @typedef {Object} VarStruct Структура переменной для подставки значений в функции
+ * @property {string} variable Идентификатор переменной
+ * @property {number} index Номер подмены
+ * @property {0|1} where 0 - Глобальная переменная, 1 - локальная переменная 
+ */
+
+/**
+ * @typedef {Object} FuncStruct Структура функции для резервирования
+ * @property {string} name Название функции для пользователя
+ * @property {boolean} success Успешность инициализации функции
+ * @property {boolean} isReturned Возвращает ли что-нибудь функция
+ * @property {number} cArguments Кол-во аргументов
+ * @property {Array<VarStruct>} variables Набор переменных для подставки значений
+ * @property {string} textcode Код функции в виде текста
+ */
+
+/**
+ * @typedef {Object} MutantWidget Мутировавший виджет
+ * @property {number} id Идентификатор переменной родителя
+ * @property {HTMLElement} element Сам элемент
+ * @property {string} widget Тип виджета
+ * @property {string} style Установленный стиль
+ * @property {string} value Значение поля value
+ * @property {string} source Источник данных в виде идентификатора массива для некоторых типов виджетов
+ */
 
 (function (Scratch) {
   'use strict';
   /*
-   * JsAddon extension v1.0 by KhandamovA
+   * JsAddon extension v1.2 by KhandamovA
    */
-
-  let functions = new Map;
-
-  let jsons_values = new Map;
-
-  let elements_styles = new Map;
-
-  let mutations = new Map;
-
-  // let custom_elements = new Map;
 
   /**
-   * @type {HTMLElement}
+   * @type {Map<FuncName, FuncStruct>} Набор пользовательских функций
+   */
+  let functions = new Map;
+
+  /**
+   * @type {Map<JsonName, Object>} Набор переменных типа JSON
+   */
+  let jsons_values = new Map;
+
+  /**
+   * @type {Map<StyleName, StyleContent>} Набор пользовательских стилей (без классов)
+   */
+  let elements_styles = new Map;
+
+  /**
+   * @type {Map<MutantParentName, MutantWidget>} Набор пользовательских виджетов
+   */
+  let mutations = new Map;
+
+  /**
+   * @type {Map<Channel, CustomSignals>} Набор пользовательских каналов с сигналами
+   */
+  let custom_signals = new Map;
+
+  /**
+   * @type {HTMLElement} HTML элемент находящийся под курсором мыши
    */
   let focusElement;
+
+  /**
+   * Идентификатор расширения
+   */
+  const my_id = 'KhandamovA';
+
+  /**
+   * Флаг для оптимизации фокуса
+   */
+  let isThrottled = false;
+
+  /**
+   * Виртуальная машина скретча
+   */
+  let vm = Scratch.vm;
+
+  /**
+   * @type {JSAddon} Экспортируемое расширение
+   */
+  var addon;
 
   let labelblock = (text) => ({
     blockType: Scratch.BlockType.LABEL,
@@ -40,18 +116,6 @@
     blockType: Scratch.BlockType.BUTTON,
     text: text
   });
-
-
-  const my_id = 'KhandamovA';
-
-  let isThrottled = false;
-
-  let vm = Scratch.vm;
-
-  /**
-   * @type {JSAddon}
-   */
-  var addon;
 
   class JSAddon {
     getInfo() {
@@ -650,10 +714,107 @@
             arguments: {
             }
           },
-          labelblock('Extra'),
+          "---",
+          labelblock('Custom signals'),
+          {
+            opcode: 'js_custom_signal_recieve',
+            blockType: Scratch.BlockType.HAT,
+            text: 'When i receive from [channel] channel signal [signal]',
+            isEdgeActivated: false,
+            shouldRestartExistingThreads: true,
+            arguments: {
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "channel"
+              },
+              signal: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'signal'
+              },
+            }
+          },
+          {
+            opcode: 'js_custom_signal_send',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'send to [channel] channel [signal] signal',
+            arguments: {
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "channel"
+              },
+              signal: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'signal'
+              },
+            }
+          },
+          "---",
+          "---",
+          {
+            opcode: 'js_custom_signal_create_channel',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'create channel [channel]',
+            arguments: {
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "newChannel"
+              },
+            }
+          },
+          {
+            opcode: 'js_custom_signal_delete_channel',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete channel [channel]',
+            arguments: {
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "channel"
+              },
+            }
+          },
+          "---",
+          {
+            opcode: 'js_custom_create_signal',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'create signal [signal] for [channel] channel',
+            arguments: {
+              signal: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "newSignal"
+              },
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "channel"
+              },
+            }
+          },
+          {
+            opcode: 'js_custom_delete_signal',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'delete from channel [channel] signal [signal]',
+            arguments: {
+              signal: {
+                type: Scratch.ArgumentType.STRING,
+                menu: 'signal'
+              },
+              channel: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "channel"
+              },
+            }
+          },
+
 
         ],
         menus: {
+          signal: {
+            acceptReporters: true,
+            items: 'getSignals'
+          },
+          channel: {
+            acceptReporters: true,
+            items: 'getChannels'
+          },
           get_vars: {
             acceptReporters: true,
             items: 'getVars'
@@ -736,6 +897,149 @@
 
     get dataStorage() {
       return vm.runtime.getTargetForStage().lookupOrCreateList('KhandamovADataStorage', 'JsAddon:Storage').value;
+    }
+
+    getChannels() {
+      if (custom_signals.size == 0) {
+        return [{
+          text: "select a channel",
+          value: "select a channel"
+        }]
+      } else {
+        let ret = [];
+        custom_signals.forEach((v, k) => {
+          ret.push({
+            text: k,
+            value: k
+          })
+        });
+
+        return ret;
+      }
+    }
+
+    getSignals(targetid) {
+      let id = this.getIdFocusBlock();
+      let target = this.getTarget(targetid);
+      if (target != null) {
+        let blocks = target.blocks._blocks;
+        if (id != null) {
+          let block = this.getBlockId(blocks, id);
+
+          let results = { array: [] };
+          // this.helper(results, blocks, id);
+
+          let variable;
+          let key;
+          if (block.success == true) {
+            this.getBlockParams(results, blocks, id);
+          }
+
+          if(results.array.length == 2){
+            if(custom_signals.has(results.array[1])){
+              let ret = [];
+              custom_signals.get(results.array[1]).forEach(x=>{
+                ret.push({
+                  text : x,
+                  value : x
+                });
+              });
+
+              if(ret.length == 0){
+                return [{
+                  text : "select a signal",
+                  text : "select a signal"
+                }];
+              }
+
+              return ret;
+            }else{
+              return [{
+                text : "select a signal",
+                text : "select a signal"
+              }];
+            }
+          }else{
+            return [{
+              text : "select a signal",
+              text : "select a signal"
+            }];
+          }
+        }else{
+          return [{
+            text : "select a signal",
+            text : "select a signal"
+          }];
+        }
+      }else{
+        return [{
+          text : "select a signal",
+          text : "select a signal"
+        }];
+      }
+    }
+
+    saveCustomSignals(){
+      let e = 0;
+      while (true) {
+        let index = this.dataStorage.indexOf('$restore_custom_signals', e);
+        e = index;
+        if (index == -1) {
+          break;
+        } else {
+          this.dataStorage.splice(index, 3);
+        }
+      }
+
+      custom_signals.forEach((v, k) => {
+        v.forEach(x=>{
+          this.dataStorage.push('$restore_custom_signals');
+          this.dataStorage.push(k);
+          this.dataStorage.push(x);
+        });
+      });
+    }
+
+    js_custom_signal_create_channel({ channel }) {
+      custom_signals.set(channel, []);
+      this.saveCustomSignals();
+    }
+
+    js_custom_signal_delete_channel({ channel }) {
+      custom_signals.delete(channel);
+      this.saveCustomSignals();
+    }
+
+    js_custom_create_signal({ signal, channel }) {
+      if (custom_signals.has(channel)) {
+        if (!custom_signals.get(channel).includes(signal)) {
+          custom_signals.get(channel).push(signal);
+          this.saveCustomSignals();
+        }
+      }
+    }
+
+    js_custom_delete_signal({ signal, channel }) {
+      if(custom_signals.has(channel)){
+        if(custom_signals.get(channel).includes(signal)){
+          let index = custom_signals.get(channel).indexOf(signal);
+          custom_signals.get(channel).splice(index, 1);
+          this.saveCustomSignals();
+        }
+      }
+    }
+
+    js_custom_signal_recieve({signal, channel}){
+
+    }
+
+    js_custom_signal_send({signal, channel}){
+      if(custom_signals.has(channel) && custom_signals.get(channel).includes(signal)){
+      vm.runtime.startHats('KhandamovA_js_custom_signal_recieve', {
+        channel,
+        signal
+      });
+    }
     }
 
     js_widgets_all() {
@@ -1611,11 +1915,6 @@
 
       //custom styles for monitors
       // let styleMonitors = document.createElement('style');
-
-
-
-
-
       // document.body.insertBefore(styleMonitors, document.body.firstChild);
 
       /**
@@ -1667,6 +1966,16 @@
               elem.innerHTML = style;
             }
             i += 1;
+          }else if(v == '$restore_custom_signals'){
+            let channel = this.dataStorage[i + 1];
+            let signal = this.dataStorage[i + 2];
+            if(!custom_signals.has(channel)){
+              custom_signals.set(channel, []);
+            }
+            if(!custom_signals.get(channel).includes(signal)){
+              custom_signals.get(channel).push(signal);
+            }
+            i += 2;
           }
         }
 
@@ -1713,7 +2022,7 @@
       } catch {
         console.error('JSAddon is not loaded. Fatal error');
       }
-      
+
       styleMonitors.innerHTML =
         "[class^='monitor_monitor-container'] {" +
         "background-color: transparent !important;" +
@@ -2660,7 +2969,7 @@
   }
 
   addon = new JSAddon();
-  
+
 
   Scratch.extensions.register(addon);
 })(Scratch);
