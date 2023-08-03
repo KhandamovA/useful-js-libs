@@ -106,6 +106,8 @@
    */
   var addon;
 
+  let include_widgets_save = false;
+
   let labelblock = (text) => ({
     blockType: Scratch.BlockType.LABEL,
     text: text
@@ -134,10 +136,15 @@
         "}";
 
       document.body.insertBefore(styleMonitors, document.body.firstChild);
+      let convertSC = document.querySelector('.sc-monitor-overlay');
+      let wait = 50;
+      if(convertSC != null){
+        wait = 100;
+      }
 
       setTimeout(() => {
         this.init({ styleMonitors });
-      }, 50);
+      }, wait);
 
       return {
         id: 'KhandamovA',
@@ -693,20 +700,20 @@
               },
             }
           },
-          // {
-          //   opcode: 'js_widgets_delete',
-          //   blockType: Scratch.BlockType.COMMAND,
-          //   text: 'удалить все виджеты из dataStorage',
-          //   arguments: {
-          //   }
-          // },
-          // {
-          //   opcode: 'js_widgets_save',
-          //   blockType: Scratch.BlockType.COMMAND,
-          //   text: 'сохранить все виджеты в dataStorage',
-          //   arguments: {
-          //   }
-          // },
+          {
+            opcode: 'js_widgets_delete',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'удалить все виджеты из dataStorage',
+            arguments: {
+            }
+          },
+          {
+            opcode: 'js_widgets_save',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'сохранить все виджеты в dataStorage',
+            arguments: {
+            }
+          },
           {
             opcode: 'js_widgets_all',
             blockType: Scratch.BlockType.REPORTER,
@@ -1124,6 +1131,8 @@
           break;
         }
       }
+      if(include_widgets_save)
+      this.js_widgets_save();
     }
 
     js_widgets_set_attribute({ variable, attr, value }) {
@@ -1175,6 +1184,8 @@
           return;
         }
       });
+      if(include_widgets_save)
+      this.js_widgets_save();
     }
 
     js_widgets_del_class({ variable, class_ }) {
@@ -1188,6 +1199,8 @@
           return;
         }
       });
+      if(include_widgets_save)
+      this.js_widgets_save();
     }
 
     js_widgets_get_class({ variable, class_ }) {
@@ -1204,6 +1217,8 @@
         }
       });
       return ret;
+      if(include_widgets_save)
+      this.js_widgets_save();
     }
 
     js_widgets_signal(args, util) {
@@ -1356,6 +1371,7 @@
           }
 
           res[i].appendChild(elem);
+          if(include_widgets_save)
           this.js_widgets_save();
 
           break;
@@ -1556,6 +1572,7 @@
 
 
           res[i].appendChild(elem);
+          if(include_widgets_save)
           this.js_widgets_save();
 
           break;
@@ -1922,6 +1939,7 @@
       /**
        * Восстановление сохраненых Json-ов, функций и стилей
        */
+      
       try {
         for (let i = 0; i < this.dataStorage.length; i++) {
           const v = this.dataStorage[i];
@@ -2021,6 +2039,7 @@
           }
         }
         console.log('JSAddon is loaded');
+        include_widgets_save = false;
       } catch {
         console.error('JSAddon is not loaded. Fatal error');
       }
@@ -2302,10 +2321,6 @@
       del.forEach(x => {
         mutations.delete(x);
       });
-
-      if(del.length > 0){
-        this.js_widgets_save();
-      }
 
       if (res.length == 0) {
         return [{
