@@ -461,6 +461,17 @@
               }
             }
           },
+          {
+            opcode: 'js_json_array_lenght',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'ключ [variable] длина массива',
+            arguments: {
+              variable: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: 'key'
+              },
+            }
+          },
           "---",
           {
             opcode: 'js_json_remove_all_vars',
@@ -1713,6 +1724,33 @@
         }
       } else {
         return "";
+      }
+    }
+
+    js_json_array_lenght({variable}){
+      let keys = variable.split('|');
+      if (keys.length >= 1 && jsons_values.has(keys[0])) {
+        let json = jsons_values.get(keys[0]);
+        for (let i = 1; i < keys.length - 1; i++) {
+          if (typeof json[keys[i]] !== 'undefined') {
+            json = json[keys[i]];
+          } else {
+            return "is not array";
+          }
+        }
+
+        let k = Object.keys(json);
+        if (keys.length > 1 && k.includes(keys[keys.length - 1])) {
+          if (typeof json[keys[keys.length - 1]] === 'object') {
+            return json[keys[keys.length - 1]].length;
+          }
+        } else if (keys.length == 1) {
+          if (typeof json === 'object') {
+            return json.length;
+          }
+        }
+      } else {
+        return "is not array";
       }
     }
 
